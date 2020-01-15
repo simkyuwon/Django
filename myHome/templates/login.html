@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}
+	login
+{% endblock title %}
+{% block content %}
+<div class="container">
+	<h2> Login </h2>
+	<form method="POST" action="{% url 'login' %}">
+		{% csrf_token %}
+		serviceNumber : 
+		<input name="serviceNumber" type="text">
+		<br>
+		Password : 
+		<input name="password" type="password">
+		<br>
+		<input type="submit" class="btn btn-primary" value="login">
+		<br>
+		serviceName : {{serviceNumber}}<br>
+		password : {{password}}<br>
+		{{error}}
+	</form>
+</div>
+{% endblock content %}

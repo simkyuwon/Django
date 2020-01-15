@@ -1,0 +1,21 @@
+{% extends "base.html"  %}
+{% load static %}
+{% block title %}
+	index
+{% endblock title %}
+{% block content %}
+	<div class="top-menu">
+		{% if user.is_authenticated %}
+			{{user.name}} <a href="/logout">log out</a>
+		{% else %}
+			<a href="/signup">sign up</a> <a href="/login">log in</a>
+		{% endif %}
+	</div>
+	<div class="list">
+		<ol>
+			{% for fireExtinguisher in fireExtinguisherList %}
+				<li>{{fireExtinguisher.place}}   {{fireExtinguisher.lastInspectionDate}}
+			{% endfor %}
+		</ol>
+	</div>
+{% endblock content %}
