@@ -8,14 +8,18 @@
 		{% if user.is_authenticated %}
 			{{user.name}} <a href="/logout">log out</a>
 		{% else %}
-			<a href="/signup">sign up</a> <a href="/login">log in</a>
+			<a href="/signup">sign up</a> <a href="/login">log in</a>   
 		{% endif %}
 	</div>
-	<div class="list">
-		<ol>
-			{% for fireExtinguisher in fireExtinguisherList %}
-				<li>{{fireExtinguisher.place}}   {{fireExtinguisher.lastInspectionDate}}
-			{% endfor %}
-		</ol>
-	</div>
+	{% if user.is_authenticated %}
+		<div class="login-main">
+			<button class="main-button" onClick="location.href='/list'">소화기</button>
+			<button class="main-button" onClick="location.href='/inspectionlist'">점검일</button>
+		</div>	
+	{% else %}
+		<div class="not-login-main">
+			소화기 DB 관리 시스템
+		</div>		
+	{% endif %}
+		{{error}}
 {% endblock content %}

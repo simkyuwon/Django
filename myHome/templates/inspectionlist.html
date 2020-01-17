@@ -1,0 +1,29 @@
+{% extends "base.html"  %}
+{% load static %}
+{% block title %}
+    inspection list 
+{% endblock title %}
+{% block content %}
+<div class="top-menu">
+	<a href="/index">Home</a> {{user.name}} <a href="/logout">log out</a>   
+</div>
+<div class="search">
+	<select name="user" onchange="location.href=this.value">
+			<option value="/inspectionlist?serviceNumber=all">All</option>
+		{% for User in userList %}
+			<option value="/inspectionlist?serviceNumber={{ User.serviceNumber }}"
+			{% if User.serviceNumber == serviceNumber %}
+				selected = "selected"
+			{% endif %}>
+			{{User.name}}</option>
+		{% endfor %}
+	</select>
+</div>
+<div id="list">
+	<ol>
+		{% for inspectionDate in inspectionDateList %}
+			<li>{{inspectionDate.fireExtinguisher}} {{inspectionDate.inspectionDate}} {{inspectionDate.inspector}}</li>
+		{% endfor %}
+	</ol>
+</div>
+{% endblock content %}

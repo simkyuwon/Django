@@ -1,6 +1,7 @@
-body {
+html, body {
 	margin : 0;
 	padding : 0;
+	height : 100%;
 }
 
 a,a:visited,a:hover,a:focus,a:active {
@@ -9,9 +10,45 @@ a,a:visited,a:hover,a:focus,a:active {
 }
 
 .top-menu {
-	padding : 10px;
+	width : 100%;
+	height : 40px;
+	line-height : 40px;
+	left : 0px;
+	top : 0px;
 	text-align : right;
 	background-color: #6090E0;
 	font-size : 20px;
 	color : #FFFFFF;
+}
+
+.not-login-main {
+	height : 100%;
+	padding : 30% 0%;
+	font-size : 50px;
+	text-align : center;
+	color : #FF4020;
+}
+
+.login-main {
+	height : 50%;
+	padding : 30% 0%;
+	text-align : center;
+}
+
+.main-button {
+	text-align : center;
+	font-size : 30px;
+	width : 30%;
+	height : 100px;
+	margin : 0% 5%;
+	display : inline-block;
+}
+
+.list {
+	font-size : 15px;
+}
+
+.inspection-main {
+	font-size : 20px;
+	color : #000000;
 }

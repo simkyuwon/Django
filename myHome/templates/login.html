@@ -5,7 +5,8 @@
 {% block content %}
 <div class="container">
 	<h2> Login </h2>
-	<form method="POST" action="{% url 'login' %}">
+	<form method="POST">
+		{{update}}
 		{% csrf_token %}
 		serviceNumber : 
 		<input name="serviceNumber" type="text">
@@ -15,8 +16,7 @@
 		<br>
 		<input type="submit" class="btn btn-primary" value="login">
 		<br>
-		serviceName : {{serviceNumber}}<br>
-		password : {{password}}<br>
+		<input name="update" type="text" value={{update}}>
 		{{error}}
 	</form>
 </div>
