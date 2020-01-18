@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from .models import User, FireExtinguisherList, InspectionDateList
 from django.contrib import auth
 from datetime import datetime
+from django.urls import reverse
 
 # Create your views here.
 
@@ -35,12 +36,14 @@ def inspection(request, *args, **kwargs):
 def inspectionupdate(request, *args, **kwargs):
 	if request.user.is_authenticated:
 		fireExtinguisher = FireExtinguisherList.objects.filter(place = request.GET.get('place',''))
+		if len(fireExtinguisher) == 0:
+			return index(request)
 		fireExtinguisher.update(lastInspectionDate = datetime.today())
 		newData = InspectionDateList(fireExtinguisher = fireExtinguisher[0], inspector = request.user)
 		newData.save()
 		return index(request)
 	else :
-		return login()
+		return redirect('../login?next='+request.get_full_path())
 
 def inspectionlist(request, *args, **kwargs):
 	if request.user.is_authenticated :
@@ -67,7 +70,10 @@ def login(request, *args, **kwargs):
 		user = auth.authenticate(request, serviceNumber=serviceNumber, password=password)
 		if user is not None:
 			auth.login(request, user)
-			return index(request)
+			if request.GET.get('next','') == '':
+				return render(request, 'index.html')
+			else:
+				return redirect(request.GET.get('next',''))
 		else:
 			return render(request, 'login.html', {'serviceNumber':serviceNumber,'password':password,'error':'serviceNumber or password is incorrect'})
 	else:

@@ -19,11 +19,14 @@
 		{% endfor %}
 	</select>
 </div>
-<div id="list">
-	<ol>
-		{% for fireExtinguisher in fireExtinguisherList %}
-			<li><a style="color : #000000" href="/inspection?place={{fireExtinguisher.place}}">{{fireExtinguisher.place}} {{fireExtinguisher.lastInspectionDate}} {{fireExtinguisher.mainInspector}}</a></li>
-		{% endfor %}
-	</ol>
-</div>
+<table class="fire-extinguisher-list" border="1px" bordercolor="black">	
+	<tr><td>소화기 위치</td><td>마지막 점검일</td><td>담당자</td></tr>
+	{% for fireExtinguisher in fireExtinguisherList %}
+		<tr>
+			<td><a style="color : #000000" href="/inspection?place={{fireExtinguisher.place}}">{{fireExtinguisher.place}}</a></td>
+			<td>{{fireExtinguisher.lastInspectionDate}}</td>
+			<td>{{fireExtinguisher.mainInspector}}</td>
+		</tr>	
+	{% endfor %}
+</table>
 {% endblock content %}

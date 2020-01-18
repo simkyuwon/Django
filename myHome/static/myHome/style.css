@@ -44,8 +44,9 @@ a,a:visited,a:hover,a:focus,a:active {
 	display : inline-block;
 }
 
-.list {
-	font-size : 15px;
+.fire-extinguisher-list {
+	width : 100%;
+	font-size : 20px;
 }
 
 .inspection-main {
