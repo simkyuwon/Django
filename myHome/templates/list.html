@@ -1,5 +1,6 @@
 {% extends "base.html"  %}
 {% load static %}
+{% load qr_code %}
 {% block title %}
     list 
 {% endblock title %}
@@ -20,12 +21,18 @@
 	</select>
 </div>
 <table class="fire-extinguisher-list" border="1px" bordercolor="black">	
-	<tr><td>소화기 위치</td><td>마지막 점검일</td><td>담당자</td></tr>
+	<tr><td>소화기 위치</td><td>마지막 점검일</td><td>담당자</td>
+	{% if user.is_admin %}
+		<td>QR code</td>
+	{% endif %}</tr>
 	{% for fireExtinguisher in fireExtinguisherList %}
 		<tr>
-			<td><a style="color : #000000" href="/inspection?place={{fireExtinguisher.place}}">{{fireExtinguisher.place}}</a></td>
+			<td>{{fireExtinguisher.place}}</td>
 			<td>{{fireExtinguisher.lastInspectionDate}}</td>
 			<td>{{fireExtinguisher.mainInspector}}</td>
+			{% if user.is_admin %}
+				<td>{% qr_from_text fireExtinguisher.id size='t' %}</td>	
+			{% endif %}
 		</tr>	
 	{% endfor %}
 </table>

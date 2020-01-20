@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+	qr reader
+{% endblock title %}
+{% block content %}
+<form enctype="multipart/form-data" action="/qrapi/" method="POST">
+	{% csrf_token %}
+	<input name="qrimg" type="file"/>
+	<input type="submit" value="Read QR code"/>
+</form>
+{% endblock content %}

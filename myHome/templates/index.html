@@ -1,5 +1,6 @@
 {% extends "base.html"  %}
 {% load static %}
+{% load qr_code %}
 {% block title %}
 	index
 {% endblock title %}
@@ -13,9 +14,11 @@
 	</div>
 	{% if user.is_authenticated %}
 		<div class="login-main">
-			<button class="main-button" onClick="location.href='/list'">소화기</button>
-			<button class="main-button" onClick="location.href='/inspectionlist'">점검일</button>
-		</div>	
+			<a href='/list'><img width=40% margin=5% src="{% static "/img/Fire_Extinguisher.png" %}" title="소화기 목록"></a>
+			<a href='/inspectionlist'><img width=40% margin=5% float=right src="{% static "/img/List.png" %}" title="점검 목록"</a>
+			<a href='/addfireextinguisher'><img width=40% margin=5% src="{% static "/img/Plus.png" %}" title="소화기 추가"></a>
+			<a href='/qrreader'><img width=40% margin=5% src="{% static "/img/Qr_Code.png" %}" title="QR 점검"></a>
+		</div>
 	{% else %}
 		<div class="not-login-main">
 			소화기 DB 관리 시스템

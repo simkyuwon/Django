@@ -28,4 +28,8 @@ urlpatterns = [
 	path('inspection/',views.inspection, name='inspection'),
 	path('inspectionupdate/',views.inspectionupdate, name='inspectionupdate'),
 	path('inspectionlist/',views.inspectionlist, name='inspectionlist'),
+	path('addfireextinguisher/',views.addfireextinguisher, name='addfireextinguisher'),
+	path('updatefireextinguisher/',views.updatefireextinguisher, name='updatefireextinguisher'),
+	path('qrreader/',views.qrreader, name='qrreader'),
+	path('qrapi/',views.qrapi, name='qrapi'),
 ]

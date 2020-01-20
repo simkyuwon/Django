@@ -4,7 +4,8 @@ from .models import User, FireExtinguisherList, InspectionDateList
 from django.contrib import auth
 from datetime import datetime
 from django.urls import reverse
-
+import requests
+import json
 # Create your views here.
 
 def index(request):
@@ -28,6 +29,25 @@ def list(request, *args, **kwargs):
 	else :
 		return index(request)
 
+def addfireextinguisher(request, *args, **kwargs):
+	if request.user.is_authenticated:
+		if request.user.is_admin:
+			userList = User.objects.all()
+			context = {"user" : request.user, "userList" : userList}
+			return render(request, "addfireextinguisher.html", context)
+	return render(request, "index.html", {"error":"관리자 전용 기능입니다."})
+
+def updatefireextinguisher(request, *args, **kwargs):
+	if request.user.is_admin:
+		if FireExtinguisherList.objects.filter(place = request.POST['place']).count() != 0:
+			userList = User.objects.all()
+			context = {"user" : request.user, "userList" : userList, "error" : "등록된 장소입니다."}
+			return render(request, "addfireextinguisher.html", context)
+		else:
+			newData = FireExtinguisherList(place = request.POST['place'], lastInspectionDate = request.POST['lastinspectiondate'], mainInspector = User.objects.get(serviceNumber = request.POST['maininspector']))
+			newData.save()	
+	return index(request)	
+
 def inspection(request, *args, **kwargs):
 	fireExtinguisher = FireExtinguisherList.objects.filter(place = request.GET.get('place',''))
 	context = {"fireExtinguisher" : fireExtinguisher}	
@@ -36,8 +56,6 @@ def inspection(request, *args, **kwargs):
 def inspectionupdate(request, *args, **kwargs):
 	if request.user.is_authenticated:
 		fireExtinguisher = FireExtinguisherList.objects.filter(place = request.GET.get('place',''))
-		if len(fireExtinguisher) == 0:
-			return index(request)
 		fireExtinguisher.update(lastInspectionDate = datetime.today())
 		newData = InspectionDateList(fireExtinguisher = fireExtinguisher[0], inspector = request.user)
 		newData.save()
@@ -96,3 +114,16 @@ def signup(request):
 		return render(request, 'signup.html') 	
 	else:
 		return render(request, 'signup.html')
+
+def qrreader(request):
+	return render(request, 'qrreader.html')
+
+def qrapi(request):
+	files = {'file':request.FILES['qrimg']}
+	response = requests.post("http://api.qrserver.com/v1/read-qr-code/", data = {"MAX_FILE_SIZE" : "1048576"},  files = files)
+	responseJson = response.json()
+	fireExtinguisher = FireExtinguisherList.objects.filter(id = responseJson[0]['symbol'][0]['data'])
+	fireExtinguisher.update(lastInspectionDate = datetime.today())
+	newData = InspectionDateList(fireExtinguisher = fireExtinguisher[0], inspector = request.user)
+	newData.save()
+	return index(request)

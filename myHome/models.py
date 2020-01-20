@@ -53,7 +53,7 @@ class User(AbstractBaseUser):
 		return self.name
 
 class FireExtinguisherList(models.Model):
-	place = models.CharField(max_length=20, primary_key=True)
+	place = models.CharField(max_length=20)
 	lastInspectionDate = models.DateField()
 	mainInspector = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 

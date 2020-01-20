@@ -11,7 +11,7 @@
 	<ol>
 		{% for fireextinguisher in fireExtinguisher %}
 			<li>{{fireextinguisher.place}} {{fireextinguisher.lastInspectionDate}} {{fireextinguisher.mainInspector}}
-			<button onClick="location.href='/inspectionupdate?place={{fireextinguisher.place}}'">점검</button>
+			<button onClick="location.href='/inspectionupdate?place={{fireextinguisher.place}}'">inspection</button>
 			</li>
 		{% endfor %}
 	</ol>
