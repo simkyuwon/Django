@@ -9,31 +9,34 @@
 	<a href="/index">Home</a> {{user.name}} <a href="/logout">log out</a>   
 </div>
 <div class="search">
-	<select name="user" onchange="location.href=this.value">
-			<option value="/list?serviceNumber=all">All</option>
-		{% for User in userList %}
-			<option value="/list?serviceNumber={{ User.serviceNumber }}"
-			{% if User.serviceNumber == serviceNumber %}
-				selected = "selected"
-			{% endif %}>
-			{{User.name}}</option>
-		{% endfor %}
-	</select>
+	<form> 
+		<select name="serviceNumber">
+			<option value="all">All</option>
+			{% for User in userList %}
+				<option value="{{ User.serviceNumber }}"
+				{% if User.serviceNumber == serviceNumber %}
+					selected = "selected"
+				{% endif %}>
+				{{User.name}}</option>
+			{% endfor %}
+		</select>
+		<input type="text" name="search" value={{search}}>
+			{% if user.is_admin %}
+				QR code : <input type="checkbox" name="qr" value="True">
+			{% endif %}
+		<input style="float:right" type="submit" value="검색">
+	</form>
 </div>
-<table class="fire-extinguisher-list" border="1px" bordercolor="black">	
-	<tr><td>소화기 위치</td><td>마지막 점검일</td><td>담당자</td>
-	{% if user.is_admin %}
-		<td>QR code</td>
-	{% endif %}</tr>
+<div class="list">
+<table class="list-table">	
+	<tr><td style="width:10em">소화기 위치</td><td>마지막 점검일</td><td style="width:8em">담당자</td></tr>
 	{% for fireExtinguisher in fireExtinguisherList %}
 		<tr>
 			<td>{{fireExtinguisher.place}}</td>
 			<td>{{fireExtinguisher.lastInspectionDate}}</td>
 			<td>{{fireExtinguisher.mainInspector}}</td>
-			{% if user.is_admin %}
-				<td>{% qr_from_text fireExtinguisher.id size='t' %}</td>	
-			{% endif %}
 		</tr>	
 	{% endfor %}
 </table>
+</div>
 {% endblock content %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static %}
+{% load qr_code %}
+{% block title %}
+	QR code list
+{% endblock title %}
+{% block content %}
+<div class="qr-page">
+	{% for fireExtinguisher in fireExtinguisherList %}
+	<table class="qr-image">
+		<tr><td class="qr">{% qr_from_text fireExtinguisher.id size=22 %}</td></tr>
+		<td class="qr">{{fireExtinguisher.place}}</td></tr>
+	{% endfor %}
+</div>
+{% endblock content %}

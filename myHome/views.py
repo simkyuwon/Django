@@ -4,8 +4,11 @@ from .models import User, FireExtinguisherList, InspectionDateList
 from django.contrib import auth
 from datetime import datetime
 from django.urls import reverse
+from django.db.models import Q
 import requests
 import json
+from PIL import Image
+from io import BytesIO
 # Create your views here.
 
 def index(request):
@@ -15,16 +18,23 @@ def list(request, *args, **kwargs):
 	if request.user.is_authenticated :
 		user = request.user
 		userList = User.objects.all()
-		if request.GET.get('serviceNumber','') == 'all' :
+		getServiceNumber = request.GET.get('serviceNumber','')	
+		getSearch = request.GET.get('search','')
+		if getServiceNumber == 'all' :
 			fireExtinguisherList = FireExtinguisherList.objects.all().order_by("place")
-		elif request.GET.get('serviceNumber','') == '' :
+		elif getServiceNumber == '' :
 			fireExtinguisherList = FireExtinguisherList.objects.filter(mainInspector = user.serviceNumber).order_by("place")
 		else :
-			fireExtinguisherList = FireExtinguisherList.objects.filter(mainInspector = request.GET.get('serviceNumber','')).order_by("place")
-		if request.GET.get('serviceNumber','') == '' :
-			context = {"fireExtinguisherList" : fireExtinguisherList, "userList" : userList, "serviceNumber" : user.serviceNumber}
+			fireExtinguisherList = FireExtinguisherList.objects.filter(mainInspector = getServiceNumber).order_by("place")
+		if getSearch :
+			fireExtinguisherList = fireExtinguisherList.filter(Q(place__icontains=getSearch)|Q(mainInspector__name__icontains=getSearch))
+		if getServiceNumber == '' :
+			context = {"fireExtinguisherList" : fireExtinguisherList, "userList" : userList, "serviceNumber" : user.serviceNumber, "search" : getSearch}
 		else :
-			context = {"fireExtinguisherList" : fireExtinguisherList, "userList" : userList, "serviceNumber" : request.GET.get('serviceNumber','')}
+			context = {"fireExtinguisherList" : fireExtinguisherList, "userList" : userList, "serviceNumber" : getServiceNumber, "search" : getSearch}
+		if request.GET.get('qr','') == 'True':
+			if request.user.is_admin:
+				return render(request, "qrlist.html", context)
 		return render(request, "list.html", context)
 	else :
 		return index(request)
@@ -67,16 +77,20 @@ def inspectionlist(request, *args, **kwargs):
 	if request.user.is_authenticated :
 		user = request.user
 		userList = User.objects.all()
-		if request.GET.get('serviceNumber','') == 'all' :
+		getServiceNumber = request.GET.get('serviceNumber','')
+		getSearch = request.GET.get('search','')
+		if getServiceNumber == 'all' :
 			inspectionDateList = InspectionDateList.objects.all().order_by("-inspectionDate")
-		elif request.GET.get('serviceNumber','') == '' :
+		elif getServiceNumber == '' :
 			inspectionDateList = InspectionDateList.objects.filter(inspector = user).order_by("-inspectionDate")
 		else :
-			inspectionDateList = InspectionDateList.objects.filter(inspector = request.GET.get('serviceNumber','')).order_by("-inspectionDate")
-		if request.GET.get('serviceNumber','') == '' :
+			inspectionDateList = InspectionDateList.objects.filter(inspector = getServiceNumber).order_by("-inspectionDate")
+		if getSearch :
+			inspectionDateList = inspectionDateList.filter(Q(fireExtinguisher__place__icontains = getSearch)|Q(inspector__name__icontains = getSearch))
+		if getServiceNumber == '' :
 			context = {"inspectionDateList" : inspectionDateList, "userList" : userList, "serviceNumber" : user.serviceNumber}
 		else :
-			context = {"inspectionDateList" : inspectionDateList, "userList" : userList, "serviceNumber" : request.GET.get('serviceNumber','')}
+			context = {"inspectionDateList" : inspectionDateList, "userList" : userList, "serviceNumber" : getServiceNumber}
 		return render(request, "inspectionlist.html", context)
 	else :
 		return index(request)
@@ -119,9 +133,19 @@ def qrreader(request):
 	return render(request, 'qrreader.html')
 
 def qrapi(request):
+	if 'qrimg' not in request.FILES:
+		return render(request,'qrreader.html', {'error':'파일 없음'})
 	files = {'file':request.FILES['qrimg']}
+	img_file = BytesIO(files['file'].read())
+	img = Image.open(img_file)
+	resize_img = img.resize((int(img.size[0] * 0.5), int(img.size[1] * 0.5)))
+	buf = BytesIO()
+	resize_img.save(buf, format='PNG')
+	files = {'file':buf.getvalue()}
 	response = requests.post("http://api.qrserver.com/v1/read-qr-code/", data = {"MAX_FILE_SIZE" : "1048576"},  files = files)
 	responseJson = response.json()
+	if responseJson[0]['symbol'][0]['error'] == "could not find/read QR Code":
+		return render(request, 'qrreader.html', {'error' : 'Qr code 인식 안됨'})
 	fireExtinguisher = FireExtinguisherList.objects.filter(id = responseJson[0]['symbol'][0]['data'])
 	fireExtinguisher.update(lastInspectionDate = datetime.today())
 	newData = InspectionDateList(fireExtinguisher = fireExtinguisher[0], inspector = request.user)

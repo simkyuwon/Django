@@ -8,22 +8,31 @@
 	<a href="/index">Home</a> {{user.name}} <a href="/logout">log out</a>   
 </div>
 <div class="search">
-	<select name="user" onchange="location.href=this.value">
-			<option value="/inspectionlist?serviceNumber=all">All</option>
-		{% for User in userList %}
-			<option value="/inspectionlist?serviceNumber={{ User.serviceNumber }}"
-			{% if User.serviceNumber == serviceNumber %}
-				selected = "selected"
-			{% endif %}>
-			{{User.name}}</option>
-		{% endfor %}
-	</select>
+	<form>
+		<select name="serviceNumber">
+			<option value="all">All</option>
+			{% for User in userList %}
+				<option value="{{ User.serviceNumber }}"
+				{% if User.serviceNumber == serviceNumber %}
+					selected = "selected"
+				{% endif %}>
+				{{User.name}}</option>
+			{% endfor %}
+		</select>
+		<input type="text" name="search" value={{search}}>
+		<input style="float:right" type="submit" value="검색">
+	</form>
 </div>
-<div id="list">
-	<ol>
+<div class="list">
+	<table class="list-table">
+		<tr><td style="width:10em">소화기 위치</td><td>마지막 점검일</td><td style="width:8em">담당자</td></tr>     	
 		{% for inspectionDate in inspectionDateList %}
-			<li>{{inspectionDate.fireExtinguisher}} {{inspectionDate.inspectionDate}} {{inspectionDate.inspector}}</li>
+		<tr>	
+			<td>{{inspectionDate.fireExtinguisher}}</td>
+			<td>{{inspectionDate.inspectionDate}}</td>
+			<td>{{inspectionDate.inspector}}</td>
+		</tr>	
 		{% endfor %}
-	</ol>
+	</table>
 </div>
 {% endblock content %}
