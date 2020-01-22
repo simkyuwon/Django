@@ -5,6 +5,7 @@ from django.contrib import auth
 from datetime import datetime
 from django.urls import reverse
 from django.db.models import Q
+from django.contrib.auth.hashers import check_password
 import requests
 import json
 from PIL import Image
@@ -116,6 +117,37 @@ def userlist(request):
 	else :
 		return index(request)
 
+def updateuser(request):
+	if request.method == "POST":
+		newPassword = request.POST["password1"]
+		user = User.objects.get(serviceNumber = request.POST['serviceNumber'])
+		originPassword = user.password
+		if newPassword != '' :
+			if request.user.is_admin :
+				if newPassword == request.POST["password2"] :
+					user.set_password(newPassword)
+			else :	
+				if not check_password(request.POST['originpassword'], originPassword):
+					return render(request, 'updateuser.html', {"User" : user, "error" : "비밀번호가 틀렸습니다."})
+				if len(newPassword) < 8 :
+					return render(request, 'updateuser.html', {"User" : user, "error" : "비밀번호는 8자 이상이어야 합니다."})
+				if newPassword == request.POST["password2"] :
+					user.set_password(newPassword)
+				else :
+					return render(request, 'updateuser.html', {"User" : user, "error" : "비밀번호가 다릅니다."})
+		if request.POST.get("adminAuth",""):
+			user.is_admin = True
+		else :
+			user.is_admin = False
+		user.name = request.POST["name"]
+		user.save()
+		if request.user.serviceNumber == request.POST["serviceNumber"] :
+			auth.login(request, user)
+		return render(request, 'index.html')	
+	else :
+		user = User.objects.get(serviceNumber = request.GET.get('serviceNumber',''))
+		return render(request, 'updateuser.html', {"User" : user})	
+
 def login(request, *args, **kwargs):
 	if request.method == "POST":
 		serviceNumber = request.POST['serviceNumber']
@@ -156,21 +188,25 @@ def qrreader(request):
 	return render(request, 'qrreader.html')
 
 def qrapi(request):
-	if 'qrimg' not in request.FILES:
-		return render(request,'qrreader.html', {'error':'파일 없음'})
-	files = {'file':request.FILES['qrimg']}
-	img_file = BytesIO(files['file'].read())
-	img = Image.open(img_file)
-	resize_img = img.resize((int(img.size[0] * 0.5), int(img.size[1] * 0.5)))
-	buf = BytesIO()
-	resize_img.save(buf, format='PNG')
-	files = {'file':buf.getvalue()}
-	response = requests.post("http://api.qrserver.com/v1/read-qr-code/", data = {"MAX_FILE_SIZE" : "1048576"},  files = files)
-	responseJson = response.json()
-	if responseJson[0]['symbol'][0]['error'] == "could not find/read QR Code":
-		return render(request, 'qrreader.html', {'error' : 'Qr code 인식 안됨'})
-	fireExtinguisher = FireExtinguisherList.objects.filter(id = responseJson[0]['symbol'][0]['data'])
-	fireExtinguisher.update(lastInspectionDate = datetime.today())
-	newData = InspectionDateList(fireExtinguisher = fireExtinguisher[0], inspector = request.user)
+	if request.POST['qrdata'] != '' :
+		fireExtinguisher = FireExtinguisherList.objects.get(id = request.POST['qrdata'])
+	else :
+		if 'qrimg' not in request.FILES:
+			return render(request,'qrreader.html', {'error':'파일 없음'})
+		files = {'file':request.FILES['qrimg']}
+		img_file = BytesIO(files['file'].read())
+		img = Image.open(img_file)
+		resize_img = img.resize((int(img.size[0] * 0.5), int(img.size[1] * 0.5)))
+		buf = BytesIO()
+		resize_img.save(buf, format='PNG')
+		files = {'file':buf.getvalue()}
+		response = requests.post("http://api.qrserver.com/v1/read-qr-code/", data = {"MAX_FILE_SIZE" : "1048576"},  files = files)
+		responseJson = response.json()
+		if responseJson[0]['symbol'][0]['error'] == "could not find/read QR Code":
+			return render(request, 'qrreader.html', {'error' : 'Qr code 인식 안됨'})
+		fireExtinguisher = FireExtinguisherList.objects.get(id = responseJson[0]['symbol'][0]['data'])
+	fireExtinguisher.lastInspectionDate = datetime.today()
+	fireExtinguisher.save()
+	newData = InspectionDateList(fireExtinguisher = fireExtinguisher, inspector = request.user)
 	newData.save()
 	return index(request)

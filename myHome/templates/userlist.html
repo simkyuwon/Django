@@ -12,10 +12,10 @@
 <table class="list-table">	
 	<tr><td style="width:10em">군번</td><td>이름</td></tr>
 	{% for User in userList %}
-		<tr>
-			<td>{{User.serviceNumber}}</td>
+		<tr>		
+			<td><a style="color:#000000" href="/updateuser?serviceNumber={{User.serviceNumber}}">{{User.serviceNumber}}</a></td>
 			<td>{{User.name}}</td>
-		</tr>	
+		</tr>
 	{% endfor %}
 </table>
 </div>

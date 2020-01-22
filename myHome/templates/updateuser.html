@@ -1,0 +1,28 @@
+{% extends "base.html"  %}
+{% load static %}
+{% load qr_code %}
+{% block title %}
+    user list 
+{% endblock title %}
+{% block content %}
+<div class="top-menu">
+	<a href="/index">Home</a> {{user.name}} <a href="/logout">log out</a>   
+</div>
+<div class="container">
+	<form class="form-main" method="POST">
+		{% csrf_token %}
+		<div class="form-text">군번</div><input class="form-input" name="serviceNumber" type="text" value={{User.serviceNumber}} readOnly>
+		<div class="form-text">이름</div><input class="form-input" name="name" type="text" value={{User.name}}>
+		<div class="form-text">새로운 비밀번호</div><input class="form-input" name="password1" type="password">
+		<div class="form-text">확인용 비밀번호</div><input class="form-input" name="password2" type="password">
+		{% if not user.is_admin %}
+			<div class="form-text">기존 비밀번호</div><input class="form-input" name="originpassword" type="password">
+		{% endif %}	
+		{% if user.is_admin %}
+			<div class="form-text">관리자 권한</div><div><input name="adminAuth" type="checkbox" value="admin" {% if User.is_admin %}checked{% endif %}></div>
+		{% endif %}	
+		<div><input type="submit" value="변경"></div>
+	</form>
+	{{error}}
+</div>
+{% endblock content %}

@@ -8,7 +8,8 @@
 	<font size=40px color=#6090E0>QR code 등록</font>
 	<form class="form-main" enctype="multipart/form-data" action="/qrapi/" method="POST">
 		{% csrf_token %}
-		<input name="qrimg" type="file"/>
+		<div><input name="qrimg" type="file"/></div>
+		<div class="form-text">QR 값 직접입력</div><input class="font-input" name="qrdata" type="text"/>
 		<br><input type="submit" value="Read QR code"/>
 	</form>
 	{{error}}

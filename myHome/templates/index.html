@@ -7,7 +7,7 @@
 {% block content %}
 	<div class="top-menu">
 		{% if user.is_authenticated %}
-			{{user.name}} <a href="/logout">log out</a>
+			<a href="/updateuser?serviceNumber={{user.serviceNumber}}">{{user.name}} </a><a href="/logout">log out</a>
 		{% else %}
 			<a href="/signup">sign up</a> <a href="/login">log in</a>   
 		{% endif %}
