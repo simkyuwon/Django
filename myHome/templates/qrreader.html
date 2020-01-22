@@ -4,10 +4,13 @@
 	qr reader
 {% endblock title %}
 {% block content %}
-<form enctype="multipart/form-data" action="/qrapi/" method="POST">
-	{% csrf_token %}
-	<input name="qrimg" type="file"/>
-	<input type="submit" value="Read QR code"/>
-</form>
-{{error}}
+<div class="container">
+	<font size=40px color=#6090E0>QR code 등록</font>
+	<form class="form-main" enctype="multipart/form-data" action="/qrapi/" method="POST">
+		{% csrf_token %}
+		<input name="qrimg" type="file"/>
+		<br><input type="submit" value="Read QR code"/>
+	</form>
+	{{error}}
+</div>
 {% endblock content %}

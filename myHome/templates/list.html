@@ -15,28 +15,39 @@
 			{% for User in userList %}
 				<option value="{{ User.serviceNumber }}"
 				{% if User.serviceNumber == serviceNumber %}
-					selected = "selected"
+					selected="selected"
 				{% endif %}>
 				{{User.name}}</option>
 			{% endfor %}
 		</select>
 		<input type="text" name="search" value={{search}}>
-			{% if user.is_admin %}
-				QR code : <input type="checkbox" name="qr" value="True">
-			{% endif %}
+		{% if user.is_admin %}
+			<select name="mode">
+				<option value="" selected="selected">검색</option>
+				<option value="qr">QRcode 보기</option>
+				<option value="delete">삭제</option>
+				<option value="add">등록</option>
+			</select>	
+		{% endif %}
 		<input style="float:right" type="submit" value="검색">
-	</form>
 </div>
 <div class="list">
 <table class="list-table">	
-	<tr><td style="width:10em">소화기 위치</td><td>마지막 점검일</td><td style="width:8em">담당자</td></tr>
+	<tr>
+	{% if user.is_admin %}
+		<td>삭제</td>
+	{% endif %}<td style="width:10em">소화기 위치</td><td>마지막 점검일</td><td style="width:8em">담당자</td></tr>
 	{% for fireExtinguisher in fireExtinguisherList %}
 		<tr>
+			{% if user.is_admin %}
+				<td><input type="checkbox" name="fireextinguisher" value={{fireExtinguisher.id}}></td>
+			{% endif %}
 			<td>{{fireExtinguisher.place}}</td>
 			<td>{{fireExtinguisher.lastInspectionDate}}</td>
 			<td>{{fireExtinguisher.mainInspector}}</td>
 		</tr>	
 	{% endfor %}
 </table>
+	</form>
 </div>
 {% endblock content %}

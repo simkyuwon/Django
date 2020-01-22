@@ -16,7 +16,7 @@
 		<div class="login-main">
 			<a href='/list'><img width=40% margin=5% src="{% static "/img/Fire_Extinguisher.png" %}" title="소화기 목록"></a>
 			<a href='/inspectionlist'><img width=40% margin=5% float=right src="{% static "/img/List.png" %}" title="점검 목록"</a>
-			<a href='/addfireextinguisher'><img width=40% margin=5% src="{% static "/img/Plus.png" %}" title="소화기 추가"></a>
+			<a href='/userlist'><img width=40% margin=5% src="{% static "/img/User_List.png" %}" title="사용자 목록"></a>
 			<a href='/qrreader'><img width=40% margin=5% src="{% static "/img/Qr_Code.png" %}" title="QR 점검"></a>
 		</div>
 	{% else %}
@@ -24,5 +24,5 @@
 			소화기 DB 관리 시스템
 		</div>		
 	{% endif %}
-		{{error}}
+	<div class="error-text">{{error}}</div>
 {% endblock content %}

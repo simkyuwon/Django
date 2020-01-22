@@ -21,13 +21,22 @@
 		</select>
 		<input type="text" name="search" value={{search}}>
 		<input style="float:right" type="submit" value="검색">
-	</form>
+		{% if user.is_admin %}	
+			<input style="float:right; margin-right:10px" type="submit" name="delete" value="삭제">
+		{% endif %}
 </div>
 <div class="list">
 	<table class="list-table">
-		<tr><td style="width:10em">소화기 위치</td><td>마지막 점검일</td><td style="width:8em">담당자</td></tr>     	
+	<tr>
+	{% if user.is_admin %}
+		<td>삭제</td>
+	{% endif %}
+		<td style="width:10em">소화기 위치</td><td>마지막 점검일</td><td style="width:8em">담당자</td></tr>     	
 		{% for inspectionDate in inspectionDateList %}
 		<tr>	
+			{% if user.is_admin %}
+				<td><input type="checkbox" name="inspectiondate" value={{inspectionDate.id}}></td>
+			{% endif %}
 			<td>{{inspectionDate.fireExtinguisher}}</td>
 			<td>{{inspectionDate.inspectionDate}}</td>
 			<td>{{inspectionDate.inspector}}</td>
@@ -35,4 +44,5 @@
 		{% endfor %}
 	</table>
 </div>
+</form>
 {% endblock content %}

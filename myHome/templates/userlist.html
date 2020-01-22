@@ -1,0 +1,22 @@
+{% extends "base.html"  %}
+{% load static %}
+{% load qr_code %}
+{% block title %}
+    user list 
+{% endblock title %}
+{% block content %}
+<div class="top-menu">
+	<a href="/index">Home</a> {{user.name}} <a href="/logout">log out</a>   
+</div>
+<div class="list">
+<table class="list-table">	
+	<tr><td style="width:10em">군번</td><td>이름</td></tr>
+	{% for User in userList %}
+		<tr>
+			<td>{{User.serviceNumber}}</td>
+			<td>{{User.name}}</td>
+		</tr>	
+	{% endfor %}
+</table>
+</div>
+{% endblock content %}

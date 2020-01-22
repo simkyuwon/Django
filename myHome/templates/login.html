@@ -3,20 +3,19 @@
 	login
 {% endblock title %}
 {% block content %}
+<div class="top-menu">
+	<a href="/index">Home</a> <a href="/signup">sign up</a>
+</div>
 <div class="container">
-	<h2> Login </h2>
-	<form method="POST">
-		{{update}}
+	<font size=40px color=#6090E0>Login</font>
+	<form class="form-main" method="POST">
 		{% csrf_token %}
-		serviceNumber : 
-		<input name="serviceNumber" type="text">
+		<div class="form-text">군번</div><input class="form-input" name="serviceNumber" type="text">
+		<div class="form-text">비밀번호</div><input class="form-input" name="password" type="password">
 		<br>
-		Password : 
-		<input name="password" type="password">
+		<input style="margin-top : 20px" type="submit" class="btn btn-primary" value="login">
 		<br>
-		<input type="submit" class="btn btn-primary" value="login">
-		<br>
-		{{error}}
+		<div class="error-text">{{error}}</div>
 	</form>
 </div>
 {% endblock content %}

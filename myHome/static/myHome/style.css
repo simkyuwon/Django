@@ -22,6 +22,37 @@ a,a:visited,a:hover,a:focus,a:active {
 	color : #FFFFFF;
 }
 
+.error-text {
+	font-size : 20px;
+	color : #FF0000;
+}
+
+.container {
+	width : 50%;
+	margin : 30% auto;
+	padding : 10px;
+	border : 5px solid #6090E0;
+	border-radius 10px;
+	font-size : 20px;
+	text-align : center;
+	font-color : #6090E0;
+}
+
+.form-main {
+	height : 50%;
+	margin-top : 20px;
+}
+
+.form-text {
+	width : 40%;
+	text-align : right;
+	float : left;
+}
+
+.form-input {
+	width : 45%;
+}
+
 .not-login-main {
 	height : 100%;
 	padding : 30% 0%;
@@ -41,13 +72,13 @@ a,a:visited,a:hover,a:focus,a:active {
 
 .search {
 	font-size : 15px;
-	margin : 5px;	
+	margin : 10px 5px;	
 }
 
 .list {
 	width : 90%;
 	font-size : 20px;
-	margin : 0px auto;
+	margin : 10px auto;
 }
 
 .list-table {

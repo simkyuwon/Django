@@ -30,6 +30,7 @@ urlpatterns = [
 	path('inspectionlist/',views.inspectionlist, name='inspectionlist'),
 	path('addfireextinguisher/',views.addfireextinguisher, name='addfireextinguisher'),
 	path('updatefireextinguisher/',views.updatefireextinguisher, name='updatefireextinguisher'),
+	path('userlist/', views.userlist, name='userlist'),	
 	path('qrreader/',views.qrreader, name='qrreader'),
 	path('qrapi/',views.qrapi, name='qrapi'),
 ]

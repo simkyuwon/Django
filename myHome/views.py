@@ -20,6 +20,13 @@ def list(request, *args, **kwargs):
 		userList = User.objects.all()
 		getServiceNumber = request.GET.get('serviceNumber','')	
 		getSearch = request.GET.get('search','')
+		getMode = request.GET.get('mode','')
+		getFireExtinguisher = request.GET.getlist('fireextinguisher','')
+		if getMode == 'add':	
+			return addfireextinguisher(request) 
+		if getMode == 'delete' :
+			fireExtinguisherList = FireExtinguisherList.objects.filter(id__in = getFireExtinguisher)
+			fireExtinguisherList.delete()
 		if getServiceNumber == 'all' :
 			fireExtinguisherList = FireExtinguisherList.objects.all().order_by("place")
 		elif getServiceNumber == '' :
@@ -32,9 +39,8 @@ def list(request, *args, **kwargs):
 			context = {"fireExtinguisherList" : fireExtinguisherList, "userList" : userList, "serviceNumber" : user.serviceNumber, "search" : getSearch}
 		else :
 			context = {"fireExtinguisherList" : fireExtinguisherList, "userList" : userList, "serviceNumber" : getServiceNumber, "search" : getSearch}
-		if request.GET.get('qr','') == 'True':
-			if request.user.is_admin:
-				return render(request, "qrlist.html", context)
+		if getMode == 'qr':
+			return render(request, "qrlist.html", context)
 		return render(request, "list.html", context)
 	else :
 		return index(request)
@@ -79,6 +85,10 @@ def inspectionlist(request, *args, **kwargs):
 		userList = User.objects.all()
 		getServiceNumber = request.GET.get('serviceNumber','')
 		getSearch = request.GET.get('search','')
+		getInspectionDate = request.GET.get('inspectiondate','')
+		if request.GET.get('delete','') != '' and getInspectionDate is not None:
+			inspectionDateList = InspectionDateList.objects.filter(id__in = getInspectionDate)
+			inspectionDateList.delete()	
 		if getServiceNumber == 'all' :
 			inspectionDateList = InspectionDateList.objects.all().order_by("-inspectionDate")
 		elif getServiceNumber == '' :
@@ -92,6 +102,17 @@ def inspectionlist(request, *args, **kwargs):
 		else :
 			context = {"inspectionDateList" : inspectionDateList, "userList" : userList, "serviceNumber" : getServiceNumber}
 		return render(request, "inspectionlist.html", context)
+	else :
+		return index(request)
+
+def userlist(request):
+	if request.user.is_authenticated :
+		if not request.user.is_admin :
+			return render(request, "index.html", {"error" : "관리자 전용 기능입니다."})
+		user = request.user
+		userList = User.objects.all()
+		context = {"userList" : userList}	
+		return render(request, "userlist.html", context)
 	else :
 		return index(request)
 
@@ -117,10 +138,12 @@ def logout(request):
 
 def signup(request):
 	if request.method == "POST":
-		if request.POST["password1"] == request.POST["password2"]:
+		password = request.POST["password1"]
+		if len(password) < 8:
+			return render(request, 'signup.html', {"error" : "비밀번호는 8자 이상이어야 합니다."})
+		if password == request.POST["password2"]:
 			user = User.objects.create_user(
 				serviceNumber = request.POST["serviceNumber"],
-				password = request.POST["password1"],
 				name = request.POST["name"],
 			)
 			auth.login(request, user)
