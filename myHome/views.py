@@ -50,7 +50,7 @@ def list(request, *args, **kwargs):
 			return render(request, "qrlist.html", context)
 		return render(request, "list.html", context)
 	else :
-		return index(request)
+		return redirect("/index")
 
 def addfireextinguisher(request, *args, **kwargs):
 	if request.user.is_authenticated:
@@ -108,8 +108,8 @@ def inspectionlist(request, *args, **kwargs):
 			context = {"inspectionDateList" : inspectionDateList, "userList" : userList, "serviceNumber" : getServiceNumber}
 		return render(request, "inspectionlist.html", context)
 	else :
-		return index(request)
-
+		return redirect("/index")
+	
 def userlist(request):
 	if request.user.is_authenticated :
 		if not request.user.is_admin :
@@ -130,7 +130,7 @@ def userlist(request):
 		return index(request)
 
 def updateuser(request):
-	if not request.user.is_authenticateed :
+	if not request.user.is_authenticated :
 		return redirect("/index")	
 	if request.method == "POST":
 		newPassword = request.POST["password1"]
@@ -157,7 +157,7 @@ def updateuser(request):
 		user.save()
 		if request.user.serviceNumber == request.POST["serviceNumber"] :
 			auth.login(request, user)
-		return render(request, 'index.html')	
+			return redirect("/index")
 	else :
 		user = User.objects.get(serviceNumber = request.GET.get('serviceNumber',''))
 		return render(request, 'updateuser.html', {"User" : user})	
@@ -170,7 +170,7 @@ def login(request, *args, **kwargs):
 		if user is not None:
 			auth.login(request, user)
 			if request.GET.get('next','') == '':
-				return redirect('/index')
+				return redirect("/index")
 			else:
 				return redirect(request.GET.get('next',''))
 		else:
@@ -180,7 +180,7 @@ def login(request, *args, **kwargs):
 
 def logout(request):
 	auth.logout(request)
-	return index(request)
+	return redirect("/index") 
 
 def signup(request):
 	if request.method == "POST":
@@ -193,7 +193,7 @@ def signup(request):
 				name = request.POST["name"],
 			)
 			auth.login(request, user)
-			return redirect('/index') 
+			return redirect("/index") 
 		return render(request, 'signup.html') 	
 	else:
 		return render(request, 'signup.html')
@@ -225,7 +225,10 @@ def qrapi(request):
 		responseJson = response.json()
 		if responseJson[0]['symbol'][0]['error'] == "could not find/read QR Code":
 			return render(request, 'qrreader.html', {'error' : 'Qr code 인식 안됨'})
-		fireExtinguisher = FireExtinguisherList.objects.get(id = responseJson[0]['symbol'][0]['data'])
+		try:	
+			fireExtinguisher = FireExtinguisherList.objects.get(id = responseJson[0]['symbol'][0]['data'])
+		except (ValueError, FireExtinguisherList.DoesNotExist):
+			return render(request, 'qrreader.html', {'error' : '등록되지 않은 ID'})
 	fireExtinguisher.lastInspectionDate = datetime.today()
 	fireExtinguisher.save()
 	newData = InspectionDateList(fireExtinguisher = fireExtinguisher, inspector = request.user, result = request.POST['result'])

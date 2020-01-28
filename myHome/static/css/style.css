@@ -46,17 +46,21 @@ a,a:visited,a:hover,a:focus,a:active {
 .form-line {
 	width : 100%;
 	margin : 10px 0px;
+	vertical-align : middle;
+	padding : auto;
 }
 
 .form-text {
 	width : 35%;
 	text-align : right;
 	float : left;
+	height : 1.5em;
 }
 
 .form-input {
 	width : 45%;
 	height : 1.5em;
+	border : #6090E0 1.5px solid;
 }
 
 .submit-btn {

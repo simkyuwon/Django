@@ -2,9 +2,21 @@
 {% load static %}
 {% load qr_code %}
 {% block title %}
-    list 
+	소화기 목록
 {% endblock title %}
 {% block content %}
+<script type="text/javascript">
+	$(function(){
+		$("#ck-all").click(function(){
+			if($("#ck-all").prop("checked")){
+				$('input[name=fireextinguisher]').prop('checked',true);
+			}
+			else{
+				$('input[name=fireextinguisher]').prop('checked',false);
+			}
+		});
+	});
+</script>
 <div class="top-menu">
 	<a href="/index">Home</a> {{user.name}} <a href="/logout">log out</a>   
 </div>
@@ -43,7 +55,7 @@
 	<table class="list-table">	
 		<tr>
 		{% if user.is_admin %}
-			<td style="width:2em">선택</td>
+			<td style="width:1em"><input type="checkbox" id="ck-all"></td>
 		{% endif %}<td style="width:10em">소화기 위치</td><td>마지막 점검일</td><td style="width:8em">담당자</td></tr>
 		{% for fireExtinguisher in fireExtinguisherList %}
 		<tr>

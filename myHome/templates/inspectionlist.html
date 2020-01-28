@@ -1,9 +1,21 @@
 {% extends "base.html"  %}
 {% load static %}
 {% block title %}
-    inspection list 
+	점검일 목록
 {% endblock title %}
 {% block content %}
+<script type="text/javascript">
+	$(function(){
+		$("#ck-all").click(function(){
+			if($("#ck-all").prop("checked")){
+				$('input[name=inspectiondate]').prop('checked',true);
+			}
+			else{
+				$('input[name=inspectiondate]').prop('checked',false);
+			}
+		});
+	});
+</script>
 <div class="top-menu">
 	<a href="/index">Home</a> {{user.name}} <a href="/logout">log out</a>   
 </div>
@@ -29,7 +41,7 @@
 	<table class="list-table">
 	<tr>
 	{% if user.is_admin %}
-		<td style="width:2em">삭제</td>
+		<td style="width:1em"><input type="checkbox" id="ck-all"></td>
 	{% endif %}
 		<td style="width:10em">소화기 위치</td><td style="width:14em">마지막 점검일</td><td style="width:5em">담당자</td><td>특이사항</td></tr>     	
 		{% for inspectionDate in inspectionDateList %}
