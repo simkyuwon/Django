@@ -64,6 +64,7 @@ class InspectionDateList(models.Model):
 	fireExtinguisher = models.ForeignKey(FireExtinguisherList , on_delete=models.SET_NULL, null=True)
 	inspectionDate = models.DateTimeField(auto_now=True)
 	inspector = models.ForeignKey(User, on_delete = models.SET_NULL, null=True)
+	result = models.CharField(max_length=50)
 
 	def __str__(self):
 		return self.fireExtinguisher.place

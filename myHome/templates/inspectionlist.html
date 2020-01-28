@@ -9,7 +9,7 @@
 </div>
 <div class="search">
 	<form>
-		<select name="serviceNumber">
+		<select name="serviceNumber" class="select-box">
 			<option value="all">All</option>
 			{% for User in userList %}
 				<option value="{{ User.serviceNumber }}"
@@ -20,18 +20,18 @@
 			{% endfor %}
 		</select>
 		<input type="text" name="search" value={{search}}>
-		<input style="float:right" type="submit" value="검색">
+		<input class="submit-btn" style="float:right" type="submit" value="검색">
 		{% if user.is_admin %}	
-			<input style="float:right; margin-right:10px" type="submit" name="delete" value="삭제">
+			<input class="submit-btn" style="float:right; margin-right:10px" type="submit" name="delete" value="삭제">
 		{% endif %}
 </div>
 <div class="list">
 	<table class="list-table">
 	<tr>
 	{% if user.is_admin %}
-		<td>삭제</td>
+		<td style="width:2em">삭제</td>
 	{% endif %}
-		<td style="width:10em">소화기 위치</td><td>마지막 점검일</td><td style="width:8em">담당자</td></tr>     	
+		<td style="width:10em">소화기 위치</td><td style="width:14em">마지막 점검일</td><td style="width:5em">담당자</td><td>특이사항</td></tr>     	
 		{% for inspectionDate in inspectionDateList %}
 		<tr>	
 			{% if user.is_admin %}
@@ -40,6 +40,7 @@
 			<td>{{inspectionDate.fireExtinguisher}}</td>
 			<td>{{inspectionDate.inspectionDate}}</td>
 			<td>{{inspectionDate.inspector}}</td>
+			<td>{{inspectionDate.result}}</td>
 		</tr>	
 		{% endfor %}
 	</table>

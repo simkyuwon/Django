@@ -10,10 +10,9 @@
 	<font size=40px color=#6090E0>Login</font>
 	<form class="form-main" method="POST">
 		{% csrf_token %}
-		<div class="form-text">군번</div><input class="form-input" name="serviceNumber" type="text">
-		<div class="form-text">비밀번호</div><input class="form-input" name="password" type="password">
-		<br>
-		<input style="margin-top : 20px" type="submit" class="btn btn-primary" value="login">
+		<div class="form-line"><div class="form-text">군번</div><input class="form-input" name="serviceNumber" type="text"></div>
+		<div class="form-line"><div class="form-text">비밀번호</div><input class="form-input" name="password" type="password"></div>
+		<input type="submit" class="submit-btn" value="login">
 		<br>
 		<div class="error-text">{{error}}</div>
 	</form>

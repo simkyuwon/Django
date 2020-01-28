@@ -21,7 +21,7 @@
 		{% if user.is_admin %}
 			<div class="form-text">관리자 권한</div><div><input name="adminAuth" type="checkbox" value="admin" {% if User.is_admin %}checked{% endif %}></div>
 		{% endif %}	
-		<div><input type="submit" value="변경"></div>
+		<div><input class="submit-btn" type="submit" value="변경"></div>
 	</form>
 	{{error}}
 </div>

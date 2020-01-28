@@ -1,0 +1,30 @@
+{% extends "base.html"  %}
+{% load static %}
+{% load qr_code %}
+{% block title %}
+    update fire extinguisher 
+{% endblock title %}
+{% block content %}
+<div class="top-menu">
+	<a href="/index">Home</a> {{user.name}} <a href="/logout">log out</a>   
+</div>
+<div class="container">
+	<form class="form-main" method="POST">
+		{% csrf_token %}
+		<input class="form-input" name="id" type="text" value="{{fireExtinguisher.id}}" hidden>
+		<div class="form-text">장소</div><input class="form-input" name="place" type="text" value="{{fireExtinguisher.place}}" readOnly>
+		<div><div class="form-text">담당자</div>
+		<select name="mainInspector" class="select-box">
+		{% for User in userList %}
+			<option value={{User.serviceNumber}}
+			{% if fireExtinguisher.mainInspector == User %}
+				selected="selected"
+			{% endif %}
+			>{{User.name}}</option>	
+		{% endfor %}	
+		</select></div>
+		<div><input class="submit-btn" type="submit" value="변경"></div>
+	</form>
+	{{error}}
+</div>
+{% endblock content %}

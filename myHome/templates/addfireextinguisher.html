@@ -8,16 +8,16 @@
 	<a href="/index">Home</a> {{user.name}} <a href="/logout">log out</a>
 </div>
 <div class="container">
-	<form action="/updatefireextinguisher/" method="POST">
+	<form action="/addfireextinguisher/" method="POST">
 		{% csrf_token %}
-		<div class="form-text">장소</div><input class="form-input" type="text" name="place"><br>
-		<div class="form-text">마지막 점검일</div><input class="form-input" type="date" name="lastinspectiondate"><br>
-		<div class="form-text">담당자</div><select name="maininspector">
+		<div class="form-line"><div class="form-text">장소</div><input class="form-input" type="text" name="place"></div>
+		<div class="form-line"><div class="form-text">마지막 점검일</div><input class="form-input" type="date" name="lastinspectiondate"></div>
+		<div class="form-line"><div class="form-text">담당자</div><select style="width:45%" name="maininspector" class="select-box">
 		{% for User in userList %}
 			<option value={{User.serviceNumber}}>{{User.name}}</option>
 		{% endfor %}
-	</select>
-	<br><input type="submit" value="등록">
+		</select></div>
+	<input class="submit-btn" type="submit" value="등록">
 	</form>
 </div>
 {{error}}

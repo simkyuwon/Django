@@ -23,19 +23,25 @@ def list(request, *args, **kwargs):
 		getSearch = request.GET.get('search','')
 		getMode = request.GET.get('mode','')
 		getFireExtinguisher = request.GET.getlist('fireextinguisher','')
-		if getMode == 'add':	
+		if getMode == 'add':
 			return addfireextinguisher(request) 
-		if getMode == 'delete' :
+		elif getMode == 'delete':
 			fireExtinguisherList = FireExtinguisherList.objects.filter(id__in = getFireExtinguisher)
 			fireExtinguisherList.delete()
-		if getServiceNumber == 'all' :
-			fireExtinguisherList = FireExtinguisherList.objects.all().order_by("place")
+		if getMode != 'delete' and getFireExtinguisher != '':
+			fireExtinguisherList = FireExtinguisherList.objects.filter(id__in = getFireExtinguisher)
+		elif getServiceNumber == 'all' :
+			fireExtinguisherList = FireExtinguisherList.objects.all()
 		elif getServiceNumber == '' :
-			fireExtinguisherList = FireExtinguisherList.objects.filter(mainInspector = user.serviceNumber).order_by("place")
+			fireExtinguisherList = FireExtinguisherList.objects.filter(mainInspector = user.serviceNumber)
 		else :
-			fireExtinguisherList = FireExtinguisherList.objects.filter(mainInspector = getServiceNumber).order_by("place")
-		if getSearch :
+			fireExtinguisherList = FireExtinguisherList.objects.filter(mainInspector = getServiceNumber)
+		if getFireExtinguisher != '' and getSearch :
 			fireExtinguisherList = fireExtinguisherList.filter(Q(place__icontains=getSearch)|Q(mainInspector__name__icontains=getSearch))
+		if request.GET.get('sort','') == '' :
+			fireExtinguisherList = fireExtinguisherList.order_by('place')
+		else :	
+			fireExtinguisherList = fireExtinguisherList.order_by(request.GET.get('sort'))
 		if getServiceNumber == '' :
 			context = {"fireExtinguisherList" : fireExtinguisherList, "userList" : userList, "serviceNumber" : user.serviceNumber, "search" : getSearch}
 		else :
@@ -50,35 +56,33 @@ def addfireextinguisher(request, *args, **kwargs):
 	if request.user.is_authenticated:
 		if request.user.is_admin:
 			userList = User.objects.all()
-			context = {"user" : request.user, "userList" : userList}
-			return render(request, "addfireextinguisher.html", context)
+			if request.method == "POST":
+				if FireExtinguisherList.objects.filter(place = request.POST['place']).count() != 0:
+					context = {"user" : request.user, "userList" : userList, "error" : "등록된 장소입니다."}
+					return render(request, "addfireextinguisher.html", context)
+				else :
+					newData = FireExtinguisherList(place = request.POST['place'], lastInspectionDate = request.POST['lastinspectiondate'], mainInspector = User.objects.get(serviceNumber = request.POST['maininspector']))
+					newData.save()
+					return index(request)	
+			else:
+				context = {"user" : request.user, "userList" : userList}
+				return render(request, "addfireextinguisher.html", context)
 	return render(request, "index.html", {"error":"관리자 전용 기능입니다."})
 
 def updatefireextinguisher(request, *args, **kwargs):
-	if request.user.is_admin:
-		if FireExtinguisherList.objects.filter(place = request.POST['place']).count() != 0:
-			userList = User.objects.all()
-			context = {"user" : request.user, "userList" : userList, "error" : "등록된 장소입니다."}
-			return render(request, "addfireextinguisher.html", context)
-		else:
-			newData = FireExtinguisherList(place = request.POST['place'], lastInspectionDate = request.POST['lastinspectiondate'], mainInspector = User.objects.get(serviceNumber = request.POST['maininspector']))
-			newData.save()	
-	return index(request)	
-
-def inspection(request, *args, **kwargs):
-	fireExtinguisher = FireExtinguisherList.objects.filter(place = request.GET.get('place',''))
-	context = {"fireExtinguisher" : fireExtinguisher}	
-	return render(request, "inspection.html", context)
-
-def inspectionupdate(request, *args, **kwargs):
-	if request.user.is_authenticated:
-		fireExtinguisher = FireExtinguisherList.objects.filter(place = request.GET.get('place',''))
-		fireExtinguisher.update(lastInspectionDate = datetime.today())
-		newData = InspectionDateList(fireExtinguisher = fireExtinguisher[0], inspector = request.user)
-		newData.save()
-		return index(request)
+	if not request.user.is_authenticated :
+		return redirect("/index")
+	if request.method == "POST":
+		fireExtinguisher = FireExtinguisherList.objects.get(id = request.POST['id'])
+		fireExtinguisher.place = request.POST['place']
+		fireExtinguisher.mainInspector = User.objects.get(serviceNumber = request.POST['mainInspector'])
+		fireExtinguisher.save()
+		return redirect("/index")	
 	else :
-		return redirect('../login?next='+request.get_full_path())
+		fireExtinguisher = FireExtinguisherList.objects.get(id = request.GET['id'])
+
+		context = {"fireExtinguisher" : fireExtinguisher, "userList" : User.objects.all()}	
+		return render(request, "updatefireextinguisher.html", context)
 
 def inspectionlist(request, *args, **kwargs):
 	if request.user.is_authenticated :
@@ -86,7 +90,7 @@ def inspectionlist(request, *args, **kwargs):
 		userList = User.objects.all()
 		getServiceNumber = request.GET.get('serviceNumber','')
 		getSearch = request.GET.get('search','')
-		getInspectionDate = request.GET.get('inspectiondate','')
+		getInspectionDate = request.GET.getlist('inspectiondate','')
 		if request.GET.get('delete','') != '' and getInspectionDate is not None:
 			inspectionDateList = InspectionDateList.objects.filter(id__in = getInspectionDate)
 			inspectionDateList.delete()	
@@ -111,13 +115,23 @@ def userlist(request):
 		if not request.user.is_admin :
 			return render(request, "index.html", {"error" : "관리자 전용 기능입니다."})
 		user = request.user
-		userList = User.objects.all()
+		if request.GET.get('search','') == '' :
+			userList = User.objects.all()
+		else :
+			getSearch = request.GET['search']
+			userList = User.objects.filter(Q(serviceNumber__icontains = getSearch)|Q(name__icontains = getSearch))
+		if request.GET.get('sort','') == '' :
+			userList = userList.order_by('serviceNumber')
+		else :
+			userList = userList.order_by(request.GET.get('sort'))
 		context = {"userList" : userList}	
 		return render(request, "userlist.html", context)
 	else :
 		return index(request)
 
 def updateuser(request):
+	if not request.user.is_authenticateed :
+		return redirect("/index")	
 	if request.method == "POST":
 		newPassword = request.POST["password1"]
 		user = User.objects.get(serviceNumber = request.POST['serviceNumber'])
@@ -156,7 +170,7 @@ def login(request, *args, **kwargs):
 		if user is not None:
 			auth.login(request, user)
 			if request.GET.get('next','') == '':
-				return render(request, 'index.html')
+				return redirect('/index')
 			else:
 				return redirect(request.GET.get('next',''))
 		else:
@@ -179,17 +193,24 @@ def signup(request):
 				name = request.POST["name"],
 			)
 			auth.login(request, user)
-			return index(request) 
+			return redirect('/index') 
 		return render(request, 'signup.html') 	
 	else:
 		return render(request, 'signup.html')
 
 def qrreader(request):
+	if not request.user.is_authenticated :
+		return redirect("/index")
 	return render(request, 'qrreader.html')
 
 def qrapi(request):
+	if not request.user.is_authenticated :
+		return redirect("/index")
 	if request.POST['qrdata'] != '' :
-		fireExtinguisher = FireExtinguisherList.objects.get(id = request.POST['qrdata'])
+		if FireExtinguisherList.objects.filter(id = request.POST['qrdata']).count() == 1 :
+			fireExtinguisher = FireExtinguisherList.objects.get(id = request.POST['qrdata'])
+		else :
+			return render(request, 'qrreader.html', {'error' : '등록되지 않은 ID'})
 	else :
 		if 'qrimg' not in request.FILES:
 			return render(request,'qrreader.html', {'error':'파일 없음'})
@@ -207,6 +228,6 @@ def qrapi(request):
 		fireExtinguisher = FireExtinguisherList.objects.get(id = responseJson[0]['symbol'][0]['data'])
 	fireExtinguisher.lastInspectionDate = datetime.today()
 	fireExtinguisher.save()
-	newData = InspectionDateList(fireExtinguisher = fireExtinguisher, inspector = request.user)
+	newData = InspectionDateList(fireExtinguisher = fireExtinguisher, inspector = request.user, result = request.POST['result'])
 	newData.save()
 	return index(request)

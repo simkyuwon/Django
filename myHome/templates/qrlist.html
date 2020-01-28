@@ -5,7 +5,7 @@
 	QR code list
 {% endblock title %}
 {% block content %}
-<div class="qr-page">
+<div class="qr-page" onClick="location.href='/index/'">
 	{% for fireExtinguisher in fireExtinguisherList %}
 	<table class="qr-image">
 		<tr><td class="qr">{% qr_from_text fireExtinguisher.id size=22 %}</td></tr>

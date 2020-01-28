@@ -4,14 +4,18 @@
 	qr reader
 {% endblock title %}
 {% block content %}
+<div class="top-menu">
+	<a href="/index">Home</a> {{user.name}} <a href="/logout">log out</a>
+</div>
 <div class="container">
-	<font size=40px color=#6090E0>QR code 등록</font>
+	<font size=40px color=#6090E0>점검 기록 등록</font>
 	<form class="form-main" enctype="multipart/form-data" action="/qrapi/" method="POST">
 		{% csrf_token %}
-		<div><input name="qrimg" type="file"/></div>
-		<div class="form-text">QR 값 직접입력</div><input class="font-input" name="qrdata" type="text"/>
-		<br><input type="submit" value="Read QR code"/>
+		<div class="form-line"><input name="qrimg" type="file"/></div>
+		<div class="form-line"><div class="form-text">QR 값 직접입력</div><input class="form-input" name="qrdata" type="text"/></div>
+		<div class="form-line"><div class="form-text">특이사항</div><input class="form-input" name="result" type="text" value="이상 없음"></div>
+		<input class="submit-btn" type="submit" value="확인"/>
 	</form>
-	{{error}}
+	<div class="error-texdt">{{error}}</div>
 </div>
 {% endblock content %}

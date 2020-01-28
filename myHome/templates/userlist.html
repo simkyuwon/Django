@@ -8,6 +8,18 @@
 <div class="top-menu">
 	<a href="/index">Home</a> {{user.name}} <a href="/logout">log out</a>   
 </div>
+<div class="search">
+<form method="GET">  
+	<input type="text" name="search" value={{search}}> 
+	<input class="submit-btn" style="float:right" type="submit" value="검색"> 
+	<select name="sort" style="float:right; margin-right:5px" class="select-box">                             
+		<option value="serviceNumber" selected="selected">군번 오름차순</option>
+		<option value="-serviceNumber">군번 내림차순</option>
+		<option value="name">이름 오름차순</option>
+		<option value="-name">이름 내림차순</option>
+	</select>
+</form>
+</div>
 <div class="list">
 <table class="list-table">	
 	<tr><td style="width:10em">군번</td><td>이름</td></tr>

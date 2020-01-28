@@ -10,11 +10,11 @@
 	<font size=40px color=#6090E0>sign up</font>
 	<form class="form-main" method="post">
 		{% csrf_token %}
-		<div class="form-text">군번</div><input class="form-input" name="serviceNumber" type="text"><br>
-		<div class="form-text">비밀번호</div><input class="form-input" name="password1" type="password"><br>
-		<div class="form-text">비밀번호 확인</div><input class="form-input" name="password2" type="password"><br>
-		<div class="form-text">이름</div><input class="form-input" name="name" type="text"><br>	
-		<input style="margin-top : 20px" type="submit" value="sign up"/>
+		<div class="form-line"><div class="form-text">군번</div><input class="form-input" name="serviceNumber" type="text"><br></div>
+		<div class="form-line"><div class="form-text">비밀번호</div><input class="form-input" name="password1" type="password"><br></div>
+		<div class="form-line"><div class="form-text">비밀번호 확인</div><input class="form-input" name="password2" type="password"><br></div>
+		<div class="form-line"><div class="form-text">이름</div><input class="form-input" name="name" type="text"></div>
+		<input class type="submit-btn" value="sign up"/>
 	</form>
 	<div class="error-text">{{error}}</div>
 </div>
