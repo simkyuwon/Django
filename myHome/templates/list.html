@@ -15,6 +15,20 @@
 				$('input[name=fireextinguisher]').prop('checked',false);
 			}
 		});
+
+		$("#up").click(function(){
+			if($("#pgnum").val () != {{maxPageNumber}}){
+				$("#pgnum").val(parseInt($("#pgnum").val())+1);
+				$("form").submit();
+			}
+		});
+
+		$("#down").click(function(){
+			if($("#pgnum").val() != 1){
+				$("#pgnum").val(parseInt($("#pgnum").val())-1);
+				$("form").submit();
+			}
+		});
 	});
 </script>
 <div class="top-menu">
@@ -22,15 +36,9 @@
 </div>
 <form> 
 	<div class="search">
-		<select name="serviceNumber" class="select-box">
-			<option value="all">All</option>
-			{% for User in userList %}
-				<option value="{{ User.serviceNumber }}"
-				{% if User.serviceNumber == serviceNumber %}
-					selected="selected"
-				{% endif %}>
-				{{User.name}}</option>
-			{% endfor %}
+		<select name="searchtype" class="select-box">
+			<option value="place">장소</option>
+			<option value="mainInspector">담당자</option>
 		</select>
 		<input type="text" name="search" value={{search}}>
 		{% if user.is_admin %}
@@ -56,7 +64,7 @@
 		<tr>
 		{% if user.is_admin %}
 			<td style="width:1em"><input type="checkbox" id="ck-all"></td>
-		{% endif %}<td style="width:10em">소화기 위치</td><td>마지막 점검일</td><td style="width:8em">담당자</td></tr>
+		{% endif %}<td style="width:10em">소화기 위치</td><td>마지막 점검일</td><td style="width:8em">담당자</td><td style="width:5em">image</td></tr>
 		{% for fireExtinguisher in fireExtinguisherList %}
 		<tr>
 		{% if user.is_admin %}
@@ -67,9 +75,24 @@
 			{% endif %}		
 			<td>{{fireExtinguisher.lastInspectionDate}}</td>
 			<td>{{fireExtinguisher.mainInspector}}</td>
+			<td>	
+			{% if fireExtinguisher.image %}
+				<img style="width:5em; height:5em"src="{{fireExtinguisher.image.url}}" alt="not found">
+			{% endif %}
+			</td>
 		</tr>	
 	{% endfor %}
 	</table>
+	<div style="width:100%; text-align:center">
+	<input id="down" type="button" value="<">
+	<input type="text" name="pagenumber" id="pgnum" style="width:3em" value=
+	{% if pageNumber %}
+		{{pageNumber}}
+	{% else %}
+		1
+	{% endif %}>
+	<input id="up" type="button" value=">">
+	</div>
 </form>
 </div>
 {% endblock content %}

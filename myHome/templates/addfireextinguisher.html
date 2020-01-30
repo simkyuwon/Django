@@ -4,20 +4,47 @@
 	새로운 소화기 등록
 {% endblock title %}
 {% block content %}
+<script type="text/javascript">
+	$(function(){
+		$("#image").change(function(){
+			var reader = new FileReader();
+			reader.readAsDataURL($("#image")[0].files[0]);
+			reader.onload = function(){
+				var Img = new Image();
+				Img.src = reader.result;
+				Img.onload = function(){
+					var canvas = document.createElement('canvas');
+					var canvasContext = canvas.getContext("2d");
+					canvas.width = 100;
+					canvas.height = 100;
+					canvasContext.drawImage(this, 0, 0, 100, 100);
+					var dataURI = canvas.toDataURL("image/*");
+					document.querySelector("#resized-img").src = dataURI;
+				};
+			};
+		});
+	});
+</script>
 <div class="top-menu">
 	<a href="/index">Home</a> {{user.name}} <a href="/logout">log out</a>
 </div>
 <div class="container">
-	<form action="/addfireextinguisher/" method="POST">
+	<form action="/addfireextinguisher/" enctype="multipart/form-data" method="POST">
 		{% csrf_token %}
 		<div class="form-line"><div class="form-text">장소</div><input class="form-input" type="text" name="place"></div>
 		<div class="form-line"><div class="form-text">마지막 점검일</div><input class="form-input" type="date" name="lastinspectiondate"></div>
 		<div class="form-line"><div class="form-text">담당자</div><select style="width:45%" name="maininspector" class="select-box">
 		{% for User in userList %}
-			<option value={{User.serviceNumber}}>{{User.name}}</option>
+			<option value={{User.serviceNumber}}
+			{% if User.serviceNumber == user.serviceNumber %}
+				selected="selected"
+			{% endif %}
+			>{{User.name}}</option>
 		{% endfor %}
 		</select></div>
-	<input class="submit-btn" type="submit" value="등록">
+		<div class="form-line"><input type="file" id="image" name="img" accept="image/*"/></div>
+		<img id="resized-img">
+		<input class="submit-btn" type="submit" value="등록">
 	</form>
 </div>
 {{error}}

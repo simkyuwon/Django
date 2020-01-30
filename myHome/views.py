@@ -19,10 +19,14 @@ def list(request, *args, **kwargs):
 	if request.user.is_authenticated :
 		user = request.user
 		userList = User.objects.all()
-		getServiceNumber = request.GET.get('serviceNumber','')	
+		getSearchType = request.GET.get('searchtype','')	
 		getSearch = request.GET.get('search','')
 		getMode = request.GET.get('mode','')
 		getFireExtinguisher = request.GET.getlist('fireextinguisher','')
+		if request.GET.get('pagenumber',''):
+			pageNumber = request.GET['pagenumber']	
+		else:
+			pageNumber = 1
 		if getMode == 'add':
 			return addfireextinguisher(request) 
 		elif getMode == 'delete':
@@ -30,22 +34,27 @@ def list(request, *args, **kwargs):
 			fireExtinguisherList.delete()
 		if getMode != 'delete' and getFireExtinguisher != '':
 			fireExtinguisherList = FireExtinguisherList.objects.filter(id__in = getFireExtinguisher)
-		elif getServiceNumber == 'all' :
-			fireExtinguisherList = FireExtinguisherList.objects.all()
-		elif getServiceNumber == '' :
-			fireExtinguisherList = FireExtinguisherList.objects.filter(mainInspector = user.serviceNumber)
 		else :
-			fireExtinguisherList = FireExtinguisherList.objects.filter(mainInspector = getServiceNumber)
-		if getFireExtinguisher != '' and getSearch :
-			fireExtinguisherList = fireExtinguisherList.filter(Q(place__icontains=getSearch)|Q(mainInspector__name__icontains=getSearch))
-		if request.GET.get('sort','') == '' :
-			fireExtinguisherList = fireExtinguisherList.order_by('place')
-		else :	
-			fireExtinguisherList = fireExtinguisherList.order_by(request.GET.get('sort'))
-		if getServiceNumber == '' :
-			context = {"fireExtinguisherList" : fireExtinguisherList, "userList" : userList, "serviceNumber" : user.serviceNumber, "search" : getSearch}
-		else :
-			context = {"fireExtinguisherList" : fireExtinguisherList, "userList" : userList, "serviceNumber" : getServiceNumber, "search" : getSearch}
+			if getSearchType == "place":
+				fireExtinguisherList = FireExtinguisherList.objects.filter(place__icontains = getSearch)
+			elif getSearchType == "mainInspector":
+				fireExtinguisherList = FireExtinguisherList.objects.filter(mainInspector__name__icontains = getSearch)
+			else :
+				fireExtinguisherList = FireExtinguisherList.objects.all()
+		if request.GET.get('sort',''):
+			fireExtinguisherList = fireExtinguisherList.order_by(request.GET['sort'])
+		pageSize = 20
+		maxPageNumber = int(fireExtinguisherList.count()/pageSize)
+		if fireExtinguisherList.count()%pageSize:
+			maxPageNumber = maxPageNumber + 1;
+		if int(pageNumber) > maxPageNumber:
+			pageNumber = maxPageNumber
+		minIdx = (int(pageNumber)-1)*pageSize
+		maxIdx = minIdx + pageSize
+		if maxIdx > fireExtinguisherList.count():
+			maxIdx = fireExtinguisherList.count()
+		fireExtinguisherList = fireExtinguisherList[minIdx:maxIdx]
+		context = {"fireExtinguisherList" : fireExtinguisherList, "userList" : userList, "search" : getSearch, "pageNumber" : pageNumber, "maxPageNumber":maxPageNumber}
 		if getMode == 'qr':
 			return render(request, "qrlist.html", context)
 		return render(request, "list.html", context)
@@ -61,7 +70,7 @@ def addfireextinguisher(request, *args, **kwargs):
 					context = {"user" : request.user, "userList" : userList, "error" : "등록된 장소입니다."}
 					return render(request, "addfireextinguisher.html", context)
 				else :
-					newData = FireExtinguisherList(place = request.POST['place'], lastInspectionDate = request.POST['lastinspectiondate'], mainInspector = User.objects.get(serviceNumber = request.POST['maininspector']))
+					newData = FireExtinguisherList(place = request.POST['place'], lastInspectionDate = request.POST['lastinspectiondate'], mainInspector = User.objects.get(serviceNumber = request.POST['maininspector']), image = request.FILES.get('img',''))
 					newData.save()
 					return index(request)	
 			else:
@@ -88,24 +97,35 @@ def inspectionlist(request, *args, **kwargs):
 	if request.user.is_authenticated :
 		user = request.user
 		userList = User.objects.all()
-		getServiceNumber = request.GET.get('serviceNumber','')
+		getSearchType = request.GET.get('searchtype','')
 		getSearch = request.GET.get('search','')
 		getInspectionDate = request.GET.getlist('inspectiondate','')
+		if request.GET.get('pagenumber',''):
+			pageNumber = request.GET['pagenumber']	
+		else:
+			pageNumber = 1
 		if request.GET.get('delete','') != '' and getInspectionDate is not None:
 			inspectionDateList = InspectionDateList.objects.filter(id__in = getInspectionDate)
 			inspectionDateList.delete()	
-		if getServiceNumber == 'all' :
-			inspectionDateList = InspectionDateList.objects.all().order_by("-inspectionDate")
-		elif getServiceNumber == '' :
-			inspectionDateList = InspectionDateList.objects.filter(inspector = user).order_by("-inspectionDate")
-		else :
-			inspectionDateList = InspectionDateList.objects.filter(inspector = getServiceNumber).order_by("-inspectionDate")
-		if getSearch :
-			inspectionDateList = inspectionDateList.filter(Q(fireExtinguisher__place__icontains = getSearch)|Q(inspector__name__icontains = getSearch))
-		if getServiceNumber == '' :
-			context = {"inspectionDateList" : inspectionDateList, "userList" : userList, "serviceNumber" : user.serviceNumber}
-		else :
-			context = {"inspectionDateList" : inspectionDateList, "userList" : userList, "serviceNumber" : getServiceNumber}
+		inspectionDateList = InspectionDateList.objects.all().order_by("-inspectionDate")
+		if request.GET.get('start',''):
+			inspectionDateList = inspectionDateList.filter(inspectionDate__date__range=(request.GET['start'],request.GET['end']))
+		if getSearchType == 'place' :
+			inspectionDateList = inspectionDateList.filter(fireExtinguisher__place__icontains = getSearch)
+		elif getSearchType == 'mainInspector':
+			inspectionDateList = inspectionDateList.filter(inspector__name__icontains = getSearch)
+		pageSize = 20
+		maxPageNumber = int(inspectionDateList.count()/pageSize)
+		if inspectionDateList.count()%pageSize:
+			maxPageNumber = maxPageNumber + 1
+		if int(pageNumber) > maxPageNumber:
+			pageNumber = maxPageNumber
+		minIdx = (int(pageNumber)-1)*pageSize
+		maxIdx = minIdx + pageSize
+		if maxIdx > inspectionDateList.count():
+			maxIdx = inspectionDateList.count()
+		inspectionDateList = inspectionDateList[minIdx:maxIdx]
+		context = {"inspectionDateList" : inspectionDateList, "userList" : userList, "search" : getSearch, "pageNumber" : pageNumber, "maxPageNumber" : maxPageNumber}
 		return render(request, "inspectionlist.html", context)
 	else :
 		return redirect("/index")
@@ -215,12 +235,6 @@ def qrapi(request):
 		if 'qrimg' not in request.FILES:
 			return render(request,'qrreader.html', {'error':'파일 없음'})
 		files = {'file':request.FILES['qrimg']}
-		img_file = BytesIO(files['file'].read())
-		img = Image.open(img_file)
-		resize_img = img.resize((int(img.size[0] * 0.5), int(img.size[1] * 0.5)))
-		buf = BytesIO()
-		resize_img.save(buf, format='PNG')
-		files = {'file':buf.getvalue()}
 		response = requests.post("http://api.qrserver.com/v1/read-qr-code/", data = {"MAX_FILE_SIZE" : "1048576"},  files = files)
 		responseJson = response.json()
 		if responseJson[0]['symbol'][0]['error'] == "could not find/read QR Code":

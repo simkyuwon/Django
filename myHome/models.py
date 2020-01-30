@@ -1,6 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+import os, uuid
 # Create your models here.
+def path_and_rename(instance, filename):
+	upload_to = 'image'
+	ext = filename.split('.')[-1]
+	filename = '{}.{}'.format(uuid.uuid4(), ext)
+	return os.path.join(upload_to, filename)
+
 class UserManager(BaseUserManager):
 	use_in_migrations = True
 
@@ -29,7 +36,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser):
 	serviceNumber = models.CharField(max_length=15, primary_key=True)
-	name = models.CharField(max_length=20)
+	name = models.CharField(max_length=5)
 	is_active = models.BooleanField(default=True)
 	is_admin = models.BooleanField(default=False)
 	is_superuser = models.BooleanField(default=False)
@@ -56,6 +63,7 @@ class FireExtinguisherList(models.Model):
 	place = models.CharField(max_length=20)
 	lastInspectionDate = models.DateField()
 	mainInspector = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+	image = models.ImageField(upload_to=path_and_rename, blank=True)
 
 	def __str__(self):
 		return self.place

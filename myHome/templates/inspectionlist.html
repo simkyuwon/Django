@@ -14,6 +14,22 @@
 				$('input[name=inspectiondate]').prop('checked',false);
 			}
 		});
+	
+		$("#up").click(function(){
+			if($("#pgnum").val () != {{maxPageNumber}}){
+				$("#pgnum").val(parseInt($("#pgnum").val())+1);
+				$("form").submit();
+			}
+		});
+
+		$("#down").click(function(){
+			if($("#pgnum").val() != 1){
+				$("#pgnum").val(parseInt($("#pgnum").val())-1);
+				$("form").submit();
+			}
+		});
+
+		$("#end").val(new Date().toISOString().substring(0,10));	
 	});
 </script>
 <div class="top-menu">
@@ -21,17 +37,13 @@
 </div>
 <div class="search">
 	<form>
-		<select name="serviceNumber" class="select-box">
-			<option value="all">All</option>
-			{% for User in userList %}
-				<option value="{{ User.serviceNumber }}"
-				{% if User.serviceNumber == serviceNumber %}
-					selected = "selected"
-				{% endif %}>
-				{{User.name}}</option>
-			{% endfor %}
+		<select name="searchtype" class="select-box">
+			<option value="place">장소</option>
+			<option value="mainInspector">담당자</option>
 		</select>
 		<input type="text" name="search" value={{search}}>
+		<input type="date" name="start">
+		<input type="date" name="end" id="end">
 		<input class="submit-btn" style="float:right" type="submit" value="검색">
 		{% if user.is_admin %}	
 			<input class="submit-btn" style="float:right; margin-right:10px" type="submit" name="delete" value="삭제">
@@ -56,6 +68,16 @@
 		</tr>	
 		{% endfor %}
 	</table>
+</div>
+<div style="width:100%; text-align:center">
+	<input id="down" type="button" value="<">
+	<input type="text" name="pagenumber" id="pgnum" style="width:3em" value=
+	{% if pageNumber %}
+		{{pageNumber}}
+	{% else %}
+		1
+	{% endif %}>
+	<input id="up" type="button" value=">">
 </div>
 </form>
 {% endblock content %}
