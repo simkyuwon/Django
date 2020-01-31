@@ -4,29 +4,8 @@
 	새로운 소화기 등록
 {% endblock title %}
 {% block content %}
-<script type="text/javascript">
-	$(function(){
-		$("#image").change(function(){
-			var reader = new FileReader();
-			reader.readAsDataURL($("#image")[0].files[0]);
-			reader.onload = function(){
-				var Img = new Image();
-				Img.src = reader.result;
-				Img.onload = function(){
-					var canvas = document.createElement('canvas');
-					var canvasContext = canvas.getContext("2d");
-					canvas.width = 100;
-					canvas.height = 100;
-					canvasContext.drawImage(this, 0, 0, 100, 100);
-					var dataURI = canvas.toDataURL("image/*");
-					document.querySelector("#resized-img").src = dataURI;
-				};
-			};
-		});
-	});
-</script>
 <div class="top-menu">
-	<a href="/index">Home</a> {{user.name}} <a href="/logout">log out</a>
+	<a href="/index">Home</a> {{user.name}} <a href="/logout">log-out</a>
 </div>
 <div class="container">
 	<form action="/addfireextinguisher/" enctype="multipart/form-data" method="POST">

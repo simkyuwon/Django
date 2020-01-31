@@ -33,7 +33,7 @@
 	});
 </script>
 <div class="top-menu">
-	<a href="/index">Home</a> {{user.name}} <a href="/logout">log out</a>   
+	<a href="/index">Home</a> {{user.name}} <a href="/logout">log-out</a>   
 </div>
 <div class="search">
 	<form>
@@ -42,8 +42,7 @@
 			<option value="mainInspector">담당자</option>
 		</select>
 		<input type="text" name="search" value={{search}}>
-		<input type="date" name="start">
-		<input type="date" name="end" id="end">
+		<input type="date" name="start">~<input type="date" name="end" id="end">
 		<input class="submit-btn" style="float:right" type="submit" value="검색">
 		{% if user.is_admin %}	
 			<input class="submit-btn" style="float:right; margin-right:10px" type="submit" name="delete" value="삭제">
@@ -71,7 +70,7 @@
 </div>
 <div style="width:100%; text-align:center">
 	<input id="down" type="button" value="<">
-	<input type="text" name="pagenumber" id="pgnum" style="width:3em" value=
+	<input type="text" name="pagenumber" id="pgnum" style="text-align:center; width:2em" value=
 	{% if pageNumber %}
 		{{pageNumber}}
 	{% else %}

@@ -5,18 +5,27 @@
 	index
 {% endblock title %}
 {% block content %}
+<script type="text/javascript">
+	$(function(){
+		$("#user-list-btn").click(function(){
+			{% if not user.is_admin %}
+				alert("관리자 전용 기능입니다.");	
+			{% endif %}	
+		});
+	});
+</script>
 	<div class="top-menu">
 		{% if user.is_authenticated %}
-			<a href="/updateuser?serviceNumber={{user.serviceNumber}}">{{user.name}} </a><a href="/logout">log out</a>
+			<a href="/updateuser?serviceNumber={{user.serviceNumber}}">{{user.name}} </a><a href="/logout">log-out</a>
 		{% else %}
-			<a href="/signup">sign up</a> <a href="/login">log in</a>   
+			<a href="/signup">sign-up</a> <a href="/login">log-in</a>   
 		{% endif %}
 	</div>
 	{% if user.is_authenticated %}
 		<div class="login-main">
 			<a href='/list'><img class="main-logo" src="{% static "/img/Fire_Extinguisher.png" %}" title="소화기 목록"></a>
 			<a href='/inspectionlist'><img class="main-logo" float=right src="{% static "/img/List.png" %}" title="점검 목록"</a>
-			<a href='/userlist'><img class="main-logo" src="{% static "/img/User_List.png" %}" title="사용자 목록"></a>
+			<a href='/userlist'><img class="main-logo" src="{% static "/img/User_List.png" %}" title="사용자 목록" id="user-list-btn"></a>
 			<a href='/qrreader'><img class="main-logo" src="{% static "/img/Qr_Code.png" %}" title="QR 점검"></a>
 		</div>
 	{% else %}
@@ -25,5 +34,4 @@
 			로그인을 해주세요.
 		</div>		
 	{% endif %}
-	<div class="error-text">{{error}}</div>
 {% endblock content %}

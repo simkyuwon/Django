@@ -47,6 +47,8 @@ def list(request, *args, **kwargs):
 		maxPageNumber = int(fireExtinguisherList.count()/pageSize)
 		if fireExtinguisherList.count()%pageSize:
 			maxPageNumber = maxPageNumber + 1;
+		if maxPageNumber == 0:
+			maxPageNumber = 1	
 		if int(pageNumber) > maxPageNumber:
 			pageNumber = maxPageNumber
 		minIdx = (int(pageNumber)-1)*pageSize
@@ -76,7 +78,7 @@ def addfireextinguisher(request, *args, **kwargs):
 			else:
 				context = {"user" : request.user, "userList" : userList}
 				return render(request, "addfireextinguisher.html", context)
-	return render(request, "index.html", {"error":"관리자 전용 기능입니다."})
+	return redirect("index.html")
 
 def updatefireextinguisher(request, *args, **kwargs):
 	if not request.user.is_authenticated :
@@ -114,10 +116,16 @@ def inspectionlist(request, *args, **kwargs):
 			inspectionDateList = inspectionDateList.filter(fireExtinguisher__place__icontains = getSearch)
 		elif getSearchType == 'mainInspector':
 			inspectionDateList = inspectionDateList.filter(inspector__name__icontains = getSearch)
+		if request.GET.get('pagenumber',''):
+			pageNumber = request.GET['pagenumber']	
+		else:
+			pageNumber = 1
 		pageSize = 20
 		maxPageNumber = int(inspectionDateList.count()/pageSize)
 		if inspectionDateList.count()%pageSize:
 			maxPageNumber = maxPageNumber + 1
+		if maxPageNumber == 0:
+			maxPageNumber = 1
 		if int(pageNumber) > maxPageNumber:
 			pageNumber = maxPageNumber
 		minIdx = (int(pageNumber)-1)*pageSize
@@ -135,16 +143,36 @@ def userlist(request):
 		if not request.user.is_admin :
 			return render(request, "index.html", {"error" : "관리자 전용 기능입니다."})
 		user = request.user
-		if request.GET.get('search','') == '' :
-			userList = User.objects.all()
-		else :
+		userList = User.objects.all()
+		if request.GET.get('search','') :
 			getSearch = request.GET['search']
-			userList = User.objects.filter(Q(serviceNumber__icontains = getSearch)|Q(name__icontains = getSearch))
+			getSearchType = request.GET['searchtype']
+			if getSearchType == 'name':
+				userList = userList.filter(name__icontains = getSearch)
+			elif getSearchType == 'serviceNumber':
+				userList = userList.filter(serviceNumber__icontains = getSearch)
 		if request.GET.get('sort','') == '' :
 			userList = userList.order_by('serviceNumber')
 		else :
 			userList = userList.order_by(request.GET.get('sort'))
-		context = {"userList" : userList}	
+		if request.GET.get('pageNumber',''):
+			pageNumber = request.GET['pageNumber']
+		else:
+			pageNumber = 1
+		pageSize = 20
+		maxPageNumber = int(userList.count()/pageSize)
+		if userList.count()%pageSize:
+			maxPageNumber = maxPageNumber + 1;
+		if maxPageNumber == 0:
+			maxPageNumber = 1	
+		if int(pageNumber) > maxPageNumber:
+			pageNumber = maxPageNumber
+		minIdx = (int(pageNumber)-1)*pageSize
+		maxIdx = minIdx + pageSize
+		if maxIdx > userList.count():
+			maxIdx = userList.count()
+		userList = userList[minIdx:maxIdx]
+		context = {"userList" : userList, "pageNumber" : pageNumber, "maxPageNumber" : maxPageNumber}
 		return render(request, "userlist.html", context)
 	else :
 		return index(request)

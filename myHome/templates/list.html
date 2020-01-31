@@ -16,6 +16,10 @@
 			}
 		});
 
+		$("#mode-select").click(function(){
+			$("form").submit();
+		});
+
 		$("#up").click(function(){
 			if($("#pgnum").val () != {{maxPageNumber}}){
 				$("#pgnum").val(parseInt($("#pgnum").val())+1);
@@ -32,7 +36,7 @@
 	});
 </script>
 <div class="top-menu">
-	<a href="/index">Home</a> {{user.name}} <a href="/logout">log out</a>   
+	<a href="/index">Home</a> {{user.name}} <a href="/logout">log-out</a>   
 </div>
 <form> 
 	<div class="search">
@@ -42,14 +46,15 @@
 		</select>
 		<input type="text" name="search" value={{search}}>
 		{% if user.is_admin %}
-			<select name="mode" class="select-box">
+			<select name="mode" class="select-box" id="mode-select" style="float:right">
 				<option value="" selected="selected">검색</option>
 				<option value="qr">QRcode 보기</option>
 				<option value="delete">삭제</option>
 				<option value="add">등록</option>
 			</select>	
-		{% endif %}
-		<input class="submit-btn" style="float:right" type="submit" value="검색">
+		{% else %}
+			<input class="submit-btn" style="float:right" type="submit" value="검색">
+		{% endif %}	
 		<select name="sort" style="float:right; margin-right:5px" class="select-box">
 			<option value="place" selected="selected">위치 오름차순</option>
 			<option value="-place">위치 내림차순</option>
@@ -85,7 +90,7 @@
 	</table>
 	<div style="width:100%; text-align:center">
 	<input id="down" type="button" value="<">
-	<input type="text" name="pagenumber" id="pgnum" style="width:3em" value=
+	<input type="text" name="pagenumber" id="pgnum" style="text-align:center; width:2em" value=
 	{% if pageNumber %}
 		{{pageNumber}}
 	{% else %}

@@ -1,6 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 import os, uuid
+from PIL import Image
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+import sys
+from django.dispatch import receiver
+from django.db.models.signals import post_delete
 # Create your models here.
 def path_and_rename(instance, filename):
 	upload_to = 'image'
@@ -65,8 +71,32 @@ class FireExtinguisherList(models.Model):
 	mainInspector = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 	image = models.ImageField(upload_to=path_and_rename, blank=True)
 
+	def save(self):
+		img = Image.open(self.image)
+		output = BytesIO()
+		width, height = img.size
+		imgSize = width * height
+		if imgSize > 1024*1024:
+			resizeImg = img.resize((int(width*1024*1024/imgSize) ,int(height*1024*1024/imgSize)))
+		else:
+			resizeImg = img
+		if img.format == 'PNG':
+			resizeImg.save(output, 'PNG')
+			output.seek(0)
+			self.image = InMemoryUploadedFile(output, 'ImageField',"image/PNG", "%s"%self.image.name, sys.getsizeof(output), None)
+		elif img.format == 'JPEG':
+			resizeImg.save(output, 'JPEG')
+			output.seek(0)
+			self.image = InMemoryUploadedFile(output, 'ImageField',"image/JPEG", "%s"%self.image.name, sys.getsizeof(output), None)
+		super(FireExtinguisherList, self).save()
+
 	def __str__(self):
 		return self.place
+
+@receiver(post_delete, sender=FireExtinguisherList)
+def FireExtinguisherList_post_delete(sender, instance, **kwargs):
+	if os.path.isfile(instance.image.path):
+		os.remove(instance.image.path)
 
 class InspectionDateList(models.Model):
 	fireExtinguisher = models.ForeignKey(FireExtinguisherList , on_delete=models.SET_NULL, null=True)
