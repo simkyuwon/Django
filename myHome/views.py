@@ -22,6 +22,7 @@ def list(request, *args, **kwargs):
 		getSearchType = request.GET.get('searchtype','')	
 		getSearch = request.GET.get('search','')
 		getMode = request.GET.get('mode','')
+		getSort = request.GET.get('sort','')	
 		getFireExtinguisher = request.GET.getlist('fireextinguisher','')
 		if request.GET.get('pagenumber',''):
 			pageNumber = request.GET['pagenumber']	
@@ -41,8 +42,8 @@ def list(request, *args, **kwargs):
 				fireExtinguisherList = FireExtinguisherList.objects.filter(mainInspector__name__icontains = getSearch)
 			else :
 				fireExtinguisherList = FireExtinguisherList.objects.all()
-		if request.GET.get('sort',''):
-			fireExtinguisherList = fireExtinguisherList.order_by(request.GET['sort'])
+		if getSort:
+			fireExtinguisherList = fireExtinguisherList.order_by(getSort)
 		pageSize = 20
 		maxPageNumber = int(fireExtinguisherList.count()/pageSize)
 		if fireExtinguisherList.count()%pageSize:
@@ -56,7 +57,7 @@ def list(request, *args, **kwargs):
 		if maxIdx > fireExtinguisherList.count():
 			maxIdx = fireExtinguisherList.count()
 		fireExtinguisherList = fireExtinguisherList[minIdx:maxIdx]
-		context = {"fireExtinguisherList" : fireExtinguisherList, "userList" : userList, "search" : getSearch, "pageNumber" : pageNumber, "maxPageNumber":maxPageNumber}
+		context = {"fireExtinguisherList" : fireExtinguisherList, "userList" : userList, "search" : getSearch, "pageNumber" : pageNumber, "maxPageNumber" : maxPageNumber, "sortType" : getSort}
 		if getMode == 'qr':
 			return render(request, "qrlist.html", context)
 		return render(request, "list.html", context)
@@ -71,14 +72,17 @@ def addfireextinguisher(request, *args, **kwargs):
 				if FireExtinguisherList.objects.filter(place = request.POST['place']).count() != 0:
 					context = {"user" : request.user, "userList" : userList, "error" : "등록된 장소입니다."}
 					return render(request, "addfireextinguisher.html", context)
+				elif not request.FILES.get('img',''):
+					context = {"user" : request.user, "userList" : userList, "error" : "사진이 없습니다."}
+					return render(request, "addfireextinguisher.html", context)
 				else :
-					newData = FireExtinguisherList(place = request.POST['place'], lastInspectionDate = request.POST['lastinspectiondate'], mainInspector = User.objects.get(serviceNumber = request.POST['maininspector']), image = request.FILES.get('img',''))
+					newData = FireExtinguisherList(place = request.POST['place'], lastInspectionDate = request.POST['lastinspectiondate'], mainInspector = User.objects.get(serviceNumber = request.POST['maininspector']), image = request.FILES['img'])
 					newData.save()
-					return index(request)	
+					return redirect("/list")	
 			else:
 				context = {"user" : request.user, "userList" : userList}
 				return render(request, "addfireextinguisher.html", context)
-	return redirect("index.html")
+	return redirect("/index")
 
 def updatefireextinguisher(request, *args, **kwargs):
 	if not request.user.is_authenticated :
@@ -112,14 +116,11 @@ def inspectionlist(request, *args, **kwargs):
 		inspectionDateList = InspectionDateList.objects.all().order_by("-inspectionDate")
 		if request.GET.get('start',''):
 			inspectionDateList = inspectionDateList.filter(inspectionDate__date__range=(request.GET['start'],request.GET['end']))
-		if getSearchType == 'place' :
-			inspectionDateList = inspectionDateList.filter(fireExtinguisher__place__icontains = getSearch)
-		elif getSearchType == 'mainInspector':
-			inspectionDateList = inspectionDateList.filter(inspector__name__icontains = getSearch)
-		if request.GET.get('pagenumber',''):
-			pageNumber = request.GET['pagenumber']	
-		else:
-			pageNumber = 1
+		if getSearch:	
+			if getSearchType == 'place' :
+				inspectionDateList = inspectionDateList.filter(fireExtinguisher__place__icontains = getSearch)
+			elif getSearchType == 'mainInspector':
+				inspectionDateList = inspectionDateList.filter(inspector__name__icontains = getSearch)
 		pageSize = 20
 		maxPageNumber = int(inspectionDateList.count()/pageSize)
 		if inspectionDateList.count()%pageSize:
@@ -141,7 +142,7 @@ def inspectionlist(request, *args, **kwargs):
 def userlist(request):
 	if request.user.is_authenticated :
 		if not request.user.is_admin :
-			return render(request, "index.html", {"error" : "관리자 전용 기능입니다."})
+			return redirect("/index")
 		user = request.user
 		userList = User.objects.all()
 		if request.GET.get('search','') :
@@ -222,7 +223,7 @@ def login(request, *args, **kwargs):
 			else:
 				return redirect(request.GET.get('next',''))
 		else:
-			return render(request, 'login.html', {'serviceNumber':serviceNumber,'password':password,'error':'serviceNumber or password is incorrect'})
+			return render(request, 'login.html', {'serviceNumber':serviceNumber,'password':password,'error':'군번 혹은 비밀번호가 틀렸습니다.'})
 	else:
 		return render(request, 'login.html')
 
@@ -255,13 +256,13 @@ def qrapi(request):
 	if not request.user.is_authenticated :
 		return redirect("/index")
 	if request.POST['qrdata'] != '' :
-		if FireExtinguisherList.objects.filter(id = request.POST['qrdata']).count() == 1 :
+		try :
 			fireExtinguisher = FireExtinguisherList.objects.get(id = request.POST['qrdata'])
-		else :
-			return render(request, 'qrreader.html', {'error' : '등록되지 않은 ID'})
+		except :
+			return render(request, 'qrreader.html', {'error':'이미지나 값이 틀렸습니다.'})
 	else :
 		if 'qrimg' not in request.FILES:
-			return render(request,'qrreader.html', {'error':'파일 없음'})
+			return render(request,'qrreader.html', {'error':'이미지나 값이 필요합니다.'})
 		files = {'file':request.FILES['qrimg']}
 		response = requests.post("http://api.qrserver.com/v1/read-qr-code/", data = {"MAX_FILE_SIZE" : "1048576"},  files = files)
 		responseJson = response.json()
@@ -270,7 +271,7 @@ def qrapi(request):
 		try:	
 			fireExtinguisher = FireExtinguisherList.objects.get(id = responseJson[0]['symbol'][0]['data'])
 		except (ValueError, FireExtinguisherList.DoesNotExist):
-			return render(request, 'qrreader.html', {'error' : '등록되지 않은 ID'})
+			return render(request, 'qrreader.html', {'error':'이미지나 값이 틀렸습니다.'})
 	fireExtinguisher.lastInspectionDate = datetime.today()
 	fireExtinguisher.save()
 	newData = InspectionDateList(fireExtinguisher = fireExtinguisher, inspector = request.user, result = request.POST['result'])

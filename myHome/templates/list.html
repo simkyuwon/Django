@@ -7,6 +7,10 @@
 {% block content %}
 <script type="text/javascript">
 	$(function(){
+		{%if sortType %}
+			$("#sort-select").val("{{sortType}}").attr("selected","selected");
+		{% endif %}
+
 		$("#ck-all").click(function(){
 			if($("#ck-all").prop("checked")){
 				$('input[name=fireextinguisher]').prop('checked',true);
@@ -16,8 +20,12 @@
 			}
 		});
 
-		$("#mode-select").click(function(){
+		$("#mode-select").change(function(){
 			$("form").submit();
+		});
+
+		$("#sort-select").change(function(){
+			$("form").submit();	
 		});
 
 		$("#up").click(function(){
@@ -47,7 +55,8 @@
 		<input type="text" name="search" value={{search}}>
 		{% if user.is_admin %}
 			<select name="mode" class="select-box" id="mode-select" style="float:right">
-				<option value="" selected="selected">검색</option>
+				<option value="" selected="selected">선택</option>
+				<option value="search">검색</option>
 				<option value="qr">QRcode 보기</option>
 				<option value="delete">삭제</option>
 				<option value="add">등록</option>
@@ -55,8 +64,8 @@
 		{% else %}
 			<input class="submit-btn" style="float:right" type="submit" value="검색">
 		{% endif %}	
-		<select name="sort" style="float:right; margin-right:5px" class="select-box">
-			<option value="place" selected="selected">위치 오름차순</option>
+		<select name="sort" style="float:right; margin-right:5px" id="sort-select" class="select-box">
+			<option value="place">위치 오름차순</option>
 			<option value="-place">위치 내림차순</option>
 			<option value="lastInspectionDate">점검일 오름차순</option>
 			<option value="-lastInspectionDate">점검일 내림차순</option>
@@ -88,15 +97,15 @@
 		</tr>	
 	{% endfor %}
 	</table>
-	<div style="width:100%; text-align:center">
-	<input id="down" type="button" value="<">
-	<input type="text" name="pagenumber" id="pgnum" style="text-align:center; width:2em" value=
-	{% if pageNumber %}
-		{{pageNumber}}
-	{% else %}
-		1
-	{% endif %}>
-	<input id="up" type="button" value=">">
+	<div class="page-select">
+		<input id="down" type="button" value="<">
+		<input type="text" name="pagenumber" id="pgnum" style="text-align:center; width:2em" value=
+		{% if pageNumber %}
+			{{pageNumber}}
+		{% else %}
+			1
+		{% endif %}>
+		<input id="up" type="button" value=">">
 	</div>
 </form>
 </div>

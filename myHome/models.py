@@ -75,11 +75,15 @@ class FireExtinguisherList(models.Model):
 		img = Image.open(self.image)
 		output = BytesIO()
 		width, height = img.size
-		imgSize = width * height
-		if imgSize > 1024*1024:
-			resizeImg = img.resize((int(width*1024*1024/imgSize) ,int(height*1024*1024/imgSize)))
+		if width > height:
+			if width > 480:
+				height = int(height * 480 / width)
+				width = 480
 		else:
-			resizeImg = img
+			if height > 480:
+				width = int(width * 480 / height)
+				height = 480
+		resizeImg = img.resize((width, height))
 		if img.format == 'PNG':
 			resizeImg.save(output, 'PNG')
 			output.seek(0)

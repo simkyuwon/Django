@@ -42,7 +42,7 @@
 </div>
 <div class="list">
 <table class="list-table">	
-	<tr><td style="width:10em">군번</td><td>이름</td></tr>
+	<tr><td style="width:8em">군번</td><td>이름</td></tr>
 	{% for User in userList %}
 		<tr>		
 			<td><a style="color:#000000" href="/updateuser?serviceNumber={{User.serviceNumber}}">{{User.serviceNumber}}</a></td>
@@ -50,7 +50,7 @@
 		</tr>
 	{% endfor %}
 </table>
-	<div style="width:100%; text-align:center">
+	<div class="page-select">
 		<input id="down" type="button" value="<">
 		<input type="text" name="pagenumber" id="pgnum" style="text-align:center; width:2em" value=                 
 		{% if pageNumber %}

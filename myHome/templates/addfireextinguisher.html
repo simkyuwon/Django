@@ -4,6 +4,11 @@
 	새로운 소화기 등록
 {% endblock title %}
 {% block content %}
+<script type="text/javascript">
+	$(function(){
+		$("#last-inspection-date").val(new Date().toISOString().substring(0,10));
+	});
+</script>
 <div class="top-menu">
 	<a href="/index">Home</a> {{user.name}} <a href="/logout">log-out</a>
 </div>
@@ -11,7 +16,7 @@
 	<form action="/addfireextinguisher/" enctype="multipart/form-data" method="POST">
 		{% csrf_token %}
 		<div class="form-line"><div class="form-text">장소</div><input class="form-input" type="text" name="place"></div>
-		<div class="form-line"><div class="form-text">마지막 점검일</div><input class="form-input" type="date" name="lastinspectiondate"></div>
+		<div class="form-line"><div class="form-text">마지막 점검일</div><input class="form-input" type="date" name="lastinspectiondate" id="last-inspection-date"></div>
 		<div class="form-line"><div class="form-text">담당자</div><select style="width:45%" name="maininspector" class="select-box">
 		{% for User in userList %}
 			<option value={{User.serviceNumber}}
@@ -21,10 +26,9 @@
 			>{{User.name}}</option>
 		{% endfor %}
 		</select></div>
-		<div class="form-line"><input type="file" id="image" name="img" accept="image/*"/></div>
-		<img id="resized-img">
+		<div class="form-line"><div class="form-text">사진</div><input type="file" id="image" name="img" accept="image/*"/></div>
 		<input class="submit-btn" type="submit" value="등록">
+		<div class="error-text">{{error}}</div>
 	</form>
 </div>
-{{error}}
 {% endblock content %}

@@ -67,16 +67,16 @@
 		</tr>	
 		{% endfor %}
 	</table>
-</div>
-<div style="width:100%; text-align:center">
-	<input id="down" type="button" value="<">
-	<input type="text" name="pagenumber" id="pgnum" style="text-align:center; width:2em" value=
-	{% if pageNumber %}
-		{{pageNumber}}
-	{% else %}
-		1
-	{% endif %}>
-	<input id="up" type="button" value=">">
+	<div class="page-select">
+		<input id="down" type="button" value="<">
+		<input type="text" name="pagenumber" id="pgnum" style="text-align:center; width:2em" value=
+		{% if pageNumber %}
+			{{pageNumber}}
+		{% else %}
+			1
+		{% endif %}>
+		<input id="up" type="button" value=">">
+	</div>
 </div>
 </form>
 {% endblock content %}
