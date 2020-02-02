@@ -24,6 +24,7 @@ class UserManager(BaseUserManager):
 			serviceNumber = serviceNumber,
 			name = name
 		)
+		user.is_active = False
 		user.set_password(password)
 		user.save(using=self._db)
 		return user
@@ -34,6 +35,7 @@ class UserManager(BaseUserManager):
 			name = name,
 			password = password,
 		)
+		user.is_active = True
 		user.is_admin = True
 		user.is_superuser = True
 		user.is_staff = True

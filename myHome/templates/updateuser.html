@@ -5,13 +5,25 @@
 	회원 정보 변경
 {% endblock title %}
 {% block content %}
+<script type="text/javascript">
+	$(function(){
+		$("#delete").click(function(){
+			var ok;
+			ok = confirm("군번은 변경할 수 없습니다.\n계정을 삭제합니까?");
+			if(ok){
+				$("form").attr('action', "/deleteuser/");
+				$("form").submit();
+			}
+		});
+	});
+</script>
 <div class="top-menu">
 	<a href="/index">Home</a> {{user.name}} <a href="/logout">log-out</a>   
 </div>
 <div class="container">
 	<form class="form-main" method="POST">
 		{% csrf_token %}
-		<div class="form-line"><div class="form-text">군번</div><input class="form-input" name="serviceNumber" type="text" value={{User.serviceNumber}} readOnly></div>
+		<div class="form-line"><div class="form-text">군번</div><input class="form-input" name="serviceNumber" type="text" value={{User.serviceNumber}} id="delete" readOnly></div>
 		<div class="form-line"><div class="form-text">이름</div><input class="form-input" name="name" type="text" value={{User.name}}></div>
 		<div class="form-line"><div class="form-text">새로운 비밀번호</div><input class="form-input" name="password1" type="password"></div>
 		<div class="form-line"><div class="form-text">확인용 비밀번호</div><input class="form-input" name="password2" type="password"></div>

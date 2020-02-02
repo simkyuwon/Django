@@ -21,7 +21,19 @@
 		});
 
 		$("#mode-select").change(function(){
-			$("form").submit();
+			if($("#mode-select").val() == "delete"){
+				var ok;	
+				ok = confirm("정말 삭제합니까?");
+				if(ok){
+					$("form").submit();
+				}
+				else{
+					$("#mode-select").val("");	
+				}
+			}
+			else{
+				$("form").submit();
+			}
 		});
 
 		$("#sort-select").change(function(){

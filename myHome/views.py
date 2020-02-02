@@ -186,18 +186,14 @@ def updateuser(request):
 		user = User.objects.get(serviceNumber = request.POST['serviceNumber'])
 		originPassword = user.password
 		if newPassword != '' :
-			if request.user.is_admin :
-				if newPassword == request.POST["password2"] :
-					user.set_password(newPassword)
-			else :	
-				if not check_password(request.POST['originpassword'], originPassword):
-					return render(request, 'updateuser.html', {"User" : user, "error" : "비밀번호가 틀렸습니다."})
-				if len(newPassword) < 8 :
-					return render(request, 'updateuser.html', {"User" : user, "error" : "비밀번호는 8자 이상이어야 합니다."})
-				if newPassword == request.POST["password2"] :
-					user.set_password(newPassword)
-				else :
-					return render(request, 'updateuser.html', {"User" : user, "error" : "비밀번호가 다릅니다."})
+			if not request.user.is_admin and not check_password(request.POST['originpassword'], originPassword):
+				return render(request, 'updateuser.html', {"User" : user, "error" : "비밀번호가 틀렸습니다."})
+			if len(newPassword) < 8 :
+				return render(request, 'updateuser.html', {"User" : user, "error" : "비밀번호는 8자 이상이어야 합니다."})
+			if newPassword == request.POST["password2"] :
+				user.set_password(newPassword)
+			else :
+				return render(request, 'updateuser.html', {"User" : user, "error" : "비밀번호가 다릅니다."})
 		if request.POST.get("adminAuth",""):
 			user.is_admin = True
 		else :
@@ -207,21 +203,42 @@ def updateuser(request):
 		if request.user.serviceNumber == request.POST["serviceNumber"] :
 			auth.login(request, user)
 			return redirect("/index")
+		return redirect("/userlist")
 	else :
 		user = User.objects.get(serviceNumber = request.GET.get('serviceNumber',''))
 		return render(request, 'updateuser.html', {"User" : user})	
+
+def activeuser(request):
+	if not request.user.is_admin :
+		return redirect("/index")	
+	try:
+		user = User.objects.get(serviceNumber = request.GET['serviceNumber'])
+		user.is_active = True
+		user.save()
+	except:
+		return redirect("/index")
+	return redirect("/userlist")
+
+def deleteuser(request):
+	if not request.user.is_authenticated :
+		return redirect("/index")	
+	User.objects.get(serviceNumber = request.POST['serviceNumber']).delete()
+	return redirect("/userlist")
 
 def login(request, *args, **kwargs):
 	if request.method == "POST":
 		serviceNumber = request.POST['serviceNumber']
 		password = request.POST['password']
-		user = auth.authenticate(request, serviceNumber=serviceNumber, password=password)
+		user = auth.authenticate(serviceNumber=serviceNumber, password=password)
 		if user is not None:
-			auth.login(request, user)
-			if request.GET.get('next','') == '':
-				return redirect("/index")
+			if user.is_active:
+				auth.login(request, user)
+				if request.GET.get('next','') == '':
+					return redirect("/index")
+				else:
+					return redirect(request.GET['next'])
 			else:
-				return redirect(request.GET.get('next',''))
+				return render(request, 'login.html', {'serviceNumber':serviceNumber,'password':password,'error':'승인되지 않은 계정'})
 		else:
 			return render(request, 'login.html', {'serviceNumber':serviceNumber,'password':password,'error':'군번 혹은 비밀번호가 틀렸습니다.'})
 	else:
@@ -234,6 +251,8 @@ def logout(request):
 def signup(request):
 	if request.method == "POST":
 		password = request.POST["password1"]
+		if User.objects.filter(serviceNumber = request.POST["serviceNumber"]).count() == 1:
+			return render(request, 'signup.html', {"error" : " 이미 등록된 군번입니다."})
 		if len(password) < 8:
 			return render(request, 'signup.html', {"error" : "비밀번호는 8자 이상이어야 합니다."})
 		if password == request.POST["password2"]:
@@ -241,7 +260,8 @@ def signup(request):
 				serviceNumber = request.POST["serviceNumber"],
 				name = request.POST["name"],
 			)
-			auth.login(request, user)
+			user.set_password(password)
+			user.save()
 			return redirect("/index") 
 		return render(request, 'signup.html') 	
 	else:

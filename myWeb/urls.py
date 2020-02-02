@@ -20,7 +20,7 @@ from django.conf.urls.static import static
 from myHome import views
 
 urlpatterns = [
-#    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls),
     path('', views.index, name='index'),
 	path('index/', views.index, name='index'),
 	path('login/',views.login, name='login'),
@@ -32,6 +32,8 @@ urlpatterns = [
 	path('updatefireextinguisher/',views.updatefireextinguisher, name='updatefireextinguisher'),
 	path('userlist/', views.userlist, name='userlist'),	
 	path('updateuser/', views.updateuser, name='updateuser'),
+	path('activeuser/', views.activeuser, name='activeuser'),
+	path('deleteuser/', views.deleteuser, name='deleteuser'),
 	path('qrreader/',views.qrreader, name='qrreader'),
 	path('qrapi/',views.qrapi, name='qrapi'),
 ]

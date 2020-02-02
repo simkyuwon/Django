@@ -6,6 +6,13 @@
 {% endblock title %}
 {% block content %}
 <script type="text/javascript">
+	function userActivation(serviceNumber){
+		var ok = confirm("계정을 승인합니까?");
+		if(ok){
+			location.href="/activeuser?serviceNumber="+serviceNumber;
+		}	
+	};
+
 	$(function(){
 		$("#up").click(function(){
 			if($("#pgnum").val () != {{maxPageNumber}}){
@@ -44,15 +51,22 @@
 <table class="list-table">	
 	<tr><td style="width:8em">군번</td><td>이름</td></tr>
 	{% for User in userList %}
-		<tr>		
+		{% if User.is_active %}
+		<tr>
 			<td><a style="color:#000000" href="/updateuser?serviceNumber={{User.serviceNumber}}">{{User.serviceNumber}}</a></td>
 			<td>{{User.name}}</td>
 		</tr>
+		{% else %}
+		<tr style="color:#909090">
+			<td onclick="userActivation({{User.serviceNumber}})">{{User.serviceNumber}}</td>
+			<td>{{User.name}}</td>
+		</tr>
+		{% endif %}
 	{% endfor %}
 </table>
 	<div class="page-select">
 		<input id="down" type="button" value="<">
-		<input type="text" name="pagenumber" id="pgnum" style="text-align:center; width:2em" value=                 
+		<input type="text" name="pagenumber" id="pgnum" style="text-align:center; width:2em" value= 
 		{% if pageNumber %}
 			{{pageNumber}}
 		{% else %}
