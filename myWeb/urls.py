@@ -36,6 +36,7 @@ urlpatterns = [
 	path('deleteuser/', views.deleteuser, name='deleteuser'),
 	path('qrreader/',views.qrreader, name='qrreader'),
 	path('qrapi/',views.qrapi, name='qrapi'),
+	path('updateinspectiondate/<int:pk>',views.updateinspectiondate, name='updateinspectiondate'),
 ]
 
 urlpatterns += static('/media/', document_root=settings.MEDIA_ROOT)

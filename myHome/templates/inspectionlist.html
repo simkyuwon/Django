@@ -5,7 +5,33 @@
 {% endblock title %}
 {% block content %}
 <script type="text/javascript">
+	function openDetail(id){
+		if($("#detail"+id).is(":visible")){
+			$("#detail"+id).hide();
+		}
+		else{
+			$("#detail"+id).show();
+		}
+	}
+
+	function submitDetail(id){
+		var newForm = $('<form method="post">{% csrf_token %}</form>');
+		newForm.attr("action","/updateinspectiondate/"+id);	
+		if($('#action'+id).val() == ''){	
+			newForm.append($('<input/>',{type:'hidden', name:'action', value:"확인"}));
+		}
+		else{
+			newForm.append($('<input/>',{type:'hidden', name:'action', value:$('#action'+id).val()}));
+		}
+		newForm.appendTo('body');
+		newForm.submit();	
+	}
+	
 	$(function(){
+		$("#search").submit(function(){
+			$('input[name=action]').remove();
+		});
+
 		$("#ck-all").click(function(){
 			if($("#ck-all").prop("checked")){
 				$('input[name=inspectiondate]').prop('checked',true);
@@ -14,18 +40,42 @@
 				$('input[name=inspectiondate]').prop('checked',false);
 			}
 		});
-	
+
 		$("#up").click(function(){
-			if($("#pgnum").val () != {{maxPageNumber}}){
+			if($("#pgnum").val() < 1){
+				$("#pgnum").val("1");
+			}
+			else if($("#pgnum").val () < {{maxPageNumber}}){
 				$("#pgnum").val(parseInt($("#pgnum").val())+1);
-				$("form").submit();
+				submitSearch();
+			}
+			else{
+				$("#pgnum").val(parseInt({{maxPageNumber}}));
 			}
 		});
 
 		$("#down").click(function(){
-			if($("#pgnum").val() != 1){
+			if($("#pgnum").val () > {{maxPageNumber}}){
+				$("#pgnum").val(parseInt({{maxPageNumber}}));
+			}
+			else if($("#pgnum").val() > 1){
 				$("#pgnum").val(parseInt($("#pgnum").val())-1);
-				$("form").submit();
+				submitSearch();
+			}
+			else{
+				$("#pgnum").val("1");
+			}
+		});
+
+		$("#pgnum").change(function(){
+			if($("#pgnum").val () > {{maxPageNumber}}){
+				$("#pgnum").val(parseInt({{maxPageNumber}}));
+			}
+			else if($("#pgnum").val() < 1){
+				$("#pgnum").val("1");
+			}
+			else{
+				submitSearch();
 			}
 		});
 
@@ -35,48 +85,72 @@
 <div class="top-menu">
 	<a href="/index">Home</a> {{user.name}} <a href="/logout">log-out</a>   
 </div>
-<div class="search">
-	<form>
+<form id="search">
+	<div class="search">
 		<select name="searchtype" class="select-box">
 			<option value="place">장소</option>
 			<option value="mainInspector">담당자</option>
 		</select>
 		<input type="text" name="search" value={{search}}>
 		<input type="date" name="start">~<input type="date" name="end" id="end">
-		<input class="submit-btn" style="float:right" type="submit" value="검색">
+		<input class="submit-btn" style="float:right" type="submit" id="search-submit" value="검색">
 		{% if user.is_admin %}	
 			<input class="submit-btn" style="float:right; margin-right:10px" type="submit" name="delete" value="삭제">
 		{% endif %}
-</div>
-<div class="list">
-	<table class="list-table">
-	<tr>
-	{% if user.is_admin %}
-		<td style="width:1em"><input type="checkbox" id="ck-all"></td>
-	{% endif %}
-		<td style="width:10em">소화기 위치</td><td style="width:14em">마지막 점검일</td><td style="width:5em">담당자</td><td>특이사항</td></tr>     	
-		{% for inspectionDate in inspectionDateList %}
-		<tr>	
-			{% if user.is_admin %}
-				<td><input type="checkbox" name="inspectiondate" value={{inspectionDate.id}}></td>
-			{% endif %}
-			<td>{{inspectionDate.fireExtinguisher}}</td>
-			<td>{{inspectionDate.inspectionDate}}</td>
-			<td>{{inspectionDate.inspector}}</td>
-			<td>{{inspectionDate.result}}</td>
-		</tr>	
-		{% endfor %}
-	</table>
-	<div class="page-select">
-		<input id="down" type="button" value="<">
-		<input type="text" name="pagenumber" id="pgnum" style="text-align:center; width:2em" value=
-		{% if pageNumber %}
-			{{pageNumber}}
-		{% else %}
-			1
-		{% endif %}>
-		<input id="up" type="button" value=">">
 	</div>
-</div>
+	<div class="list">
+		<table class="list-table">
+			<tr>
+			{% if user.is_admin %}
+				<td style="width:1em"><input type="checkbox" id="ck-all"></td>
+			{% endif %}
+				<td style="width:8em">소화기 위치</td><td style="width:3em">중대</td><td style="width:14em">마지막 점검일</td><td style="width:5em">담당자</td><td style="width:3em">detail</td></tr>     	
+			{% for inspectionDate in inspectionDateList %}
+				<tr name="simple">
+				{% if user.is_admin %}
+					<td><input type="checkbox" name="inspectiondate" value={{inspectionDate.id}}></td>
+				{% endif %}
+				<td>{{inspectionDate.fireExtinguisher}}</td>
+				<td>{{inspectionDate.fireExtinguisher.company}}</td>
+				<td>{{inspectionDate.inspectionDate}}</td>
+				<td>{{inspectionDate.inspector}}</td>
+				<td><img 
+				{% if inspectionDate.action %}
+					src = "{% static "img/green.png" %}" 
+				{% elif inspectionDate.result == "이상 없음" %}
+					src = "{% static "img/yellow.png" %}" 
+				{% else %}
+					src = "{% static "img/red.png" %}" 
+				{% endif %}
+				onclick="openDetail({{inspectionDate.id}})" width="15px"></td>
+				</tr>
+			<tr id="detail{{inspectionDate.id}}" hidden>
+				<td colspan="6" style="padding:5px">
+					<table class="list-table">
+						<tr><td style="width:6em">특이사항</td><td>{{inspectionDate.result}}</td></tr>
+						<tr><td>조치사항</td><td><input type="text" id="action{{inspectionDate.id}}" style="width:100%; border:0px; outline:none;" value="{{inspectionDate.action}}"
+						{% if not user.is_admin %}
+							readOnly	
+						{% endif %}
+						></td></tr>
+					</table>
+					{% if user.is_admin %}
+						<input type="button" class="submit-btn" style="float:right" onclick="submitDetail({{inspectionDate.id}})" value="수정">
+					{% endif %}
+				</td>
+			</tr>
+			{% endfor %}
+		</table>
+		<div class="page-select">
+			<input id="down" type="button" value="<">
+			<input type="text" name="pagenumber" id="pgnum" style="text-align:center; width:2em" value=
+			{% if pageNumber %}
+				{{pageNumber}}
+			{% else %}
+				1
+			{% endif %}>
+			<input id="up" type="button" value=">">
+		</div>
+	</div>
 </form>
 {% endblock content %}

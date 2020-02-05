@@ -90,15 +90,16 @@
 		<tr>
 		{% if user.is_admin %}
 			<td style="width:1em"><input type="checkbox" id="ck-all"></td>
-		{% endif %}<td style="width:10em">소화기 위치</td><td>마지막 점검일</td><td style="width:8em">담당자</td><td style="width:5em">image</td></tr>
+		{% endif %}<td style="width:10em">소화기 위치</td><td style="width:3em">소속</td><td>마지막 점검일</td><td style="width:8em">담당자</td><td style="width:5em">image</td></tr>
 		{% for fireExtinguisher in fireExtinguisherList %}
 		<tr>
-		{% if user.is_admin %}
-			<td><input type="checkbox" name="fireextinguisher" value={{fireExtinguisher.id}}></td>
-			<td><a style="color:#000000" href="/updatefireextinguisher?id={{fireExtinguisher.id}}">{{fireExtinguisher.place}}</a></td>
+			{% if user.is_admin %}
+				<td><input type="checkbox" name="fireextinguisher" value={{fireExtinguisher.id}}></td>
+				<td><a style="color:#000000" href="/updatefireextinguisher?id={{fireExtinguisher.id}}">{{fireExtinguisher.place}}</a></td>
 			{% else %}
 				<td>{{fireExtinguisher.place}}</td>
-			{% endif %}		
+			{% endif %}
+			<td>{{fireExtinguisher.company}}</td>
 			<td>{{fireExtinguisher.lastInspectionDate}}</td>
 			<td>{{fireExtinguisher.mainInspector}}</td>
 			<td>	

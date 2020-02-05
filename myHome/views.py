@@ -42,6 +42,8 @@ def list(request, *args, **kwargs):
 				fireExtinguisherList = FireExtinguisherList.objects.filter(mainInspector__name__icontains = getSearch)
 			else :
 				fireExtinguisherList = FireExtinguisherList.objects.all()
+		if user.company != 'AD':
+			fireExtinguisherList = fireExtinguisherList.filter(company = user.company)
 		if getSort:
 			fireExtinguisherList = fireExtinguisherList.order_by(getSort)
 		pageSize = 20
@@ -76,7 +78,7 @@ def addfireextinguisher(request, *args, **kwargs):
 					context = {"user" : request.user, "userList" : userList, "error" : "사진이 없습니다."}
 					return render(request, "addfireextinguisher.html", context)
 				else :
-					newData = FireExtinguisherList(place = request.POST['place'], lastInspectionDate = request.POST['lastinspectiondate'], mainInspector = User.objects.get(serviceNumber = request.POST['maininspector']), image = request.FILES['img'])
+					newData = FireExtinguisherList(place = request.POST['place'], company = request.POST['company'], lastInspectionDate = request.POST['lastinspectiondate'], mainInspector = User.objects.get(serviceNumber = request.POST['maininspector']), image = request.FILES['img'])
 					newData.save()
 					return redirect("/list")	
 			else:
@@ -85,17 +87,16 @@ def addfireextinguisher(request, *args, **kwargs):
 	return redirect("/index")
 
 def updatefireextinguisher(request, *args, **kwargs):
-	if not request.user.is_authenticated :
+	if not request.user.is_admin :
 		return redirect("/index")
 	if request.method == "POST":
 		fireExtinguisher = FireExtinguisherList.objects.get(id = request.POST['id'])
 		fireExtinguisher.place = request.POST['place']
 		fireExtinguisher.mainInspector = User.objects.get(serviceNumber = request.POST['mainInspector'])
-		fireExtinguisher.save()
+		fireExtinguisher.update()
 		return redirect("/index")	
 	else :
 		fireExtinguisher = FireExtinguisherList.objects.get(id = request.GET['id'])
-
 		context = {"fireExtinguisher" : fireExtinguisher, "userList" : User.objects.all()}	
 		return render(request, "updatefireextinguisher.html", context)
 
@@ -121,6 +122,8 @@ def inspectionlist(request, *args, **kwargs):
 				inspectionDateList = inspectionDateList.filter(fireExtinguisher__place__icontains = getSearch)
 			elif getSearchType == 'mainInspector':
 				inspectionDateList = inspectionDateList.filter(inspector__name__icontains = getSearch)
+		if user.company != 'AD':
+			inspectionDateList = inspectionDateList.filter(fireExtinguisher__company = user.company)
 		pageSize = 20
 		maxPageNumber = int(inspectionDateList.count()/pageSize)
 		if inspectionDateList.count()%pageSize:
@@ -137,6 +140,17 @@ def inspectionlist(request, *args, **kwargs):
 		context = {"inspectionDateList" : inspectionDateList, "userList" : userList, "search" : getSearch, "pageNumber" : pageNumber, "maxPageNumber" : maxPageNumber}
 		return render(request, "inspectionlist.html", context)
 	else :
+		return redirect("/index")
+
+def updateinspectiondate(request, pk):
+	if not request.user.is_admin:
+		return redirect("/index")
+	try:
+		inspectionDate = InspectionDateList.objects.get(id = pk)
+		inspectionDate.action = request.POST.get('action','')
+		inspectionDate.save()
+		return redirect("/inspectionlist")
+	except:
 		return redirect("/index")
 	
 def userlist(request):
@@ -199,6 +213,7 @@ def updateuser(request):
 		else :
 			user.is_admin = False
 		user.name = request.POST["name"]
+		user.company = request.POST["company"]
 		user.save()
 		if request.user.serviceNumber == request.POST["serviceNumber"] :
 			auth.login(request, user)
@@ -259,6 +274,7 @@ def signup(request):
 			user = User.objects.create_user(
 				serviceNumber = request.POST["serviceNumber"],
 				name = request.POST["name"],
+				company = request.POST["company"],
 			)
 			user.set_password(password)
 			user.save()
@@ -293,7 +309,7 @@ def qrapi(request):
 		except (ValueError, FireExtinguisherList.DoesNotExist):
 			return render(request, 'qrreader.html', {'error':'이미지나 값이 틀렸습니다.'})
 	fireExtinguisher.lastInspectionDate = datetime.today()
-	fireExtinguisher.save()
+	fireExtinguisher.update()
 	newData = InspectionDateList(fireExtinguisher = fireExtinguisher, inspector = request.user, result = request.POST['result'])
 	newData.save()
 	return index(request)

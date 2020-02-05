@@ -26,6 +26,14 @@
 			>{{User.name}}</option>
 		{% endfor %}
 		</select></div>
+		<div class="form-line"><div class="form-text">담당 중대</div>
+			<select name="company" style="width:45%" class="select-box">
+				<option value="1CO">1CO</option>
+				<option value="2CO">2CO</option>
+				<option value="3CO">3CO</option>
+				<option value="HQ">HQ</option>
+			</select>
+		</div>
 		<div class="form-line"><div class="form-text">사진</div><input type="file" id="image" name="img" accept="image/*"/></div>
 		<input class="submit-btn" type="submit" value="등록">
 		<div class="error-text">{{error}}</div>

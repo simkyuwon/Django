@@ -7,6 +7,8 @@
 {% block content %}
 <script type="text/javascript">
 	$(function(){
+		$("select[name=company]").val("{{User.company}}").attr("selected","selected");
+
 		$("#delete").click(function(){
 			var ok;
 			ok = confirm("군번은 변경할 수 없습니다.\n계정을 삭제합니까?");
@@ -30,6 +32,17 @@
 		{% if not user.is_admin %}
 			<div class="form-line"><div class="form-text">기존 비밀번호</div><input class="form-input" name="originpassword" type="password"></div>
 		{% endif %}	
+	 	<div class="form-line"><div class="form-text">소속 중대</div>
+			<select name="company" style="width:45%" class="select-box">
+				<option value="1CO">1CO</option>
+				<option value="2CO">2CO</option>
+				<option value="3CO">3CO</option>
+				<option value="HQ">HQ</option>
+				{% if user.is_admin %}
+					<option value="AD">admin</option>
+				{% endif %}
+			</select> 
+		</div>
 		{% if user.is_admin %}
 			<div class="form-line"><div class="form-text">관리자 권한</div><div><input name="adminAuth" type="checkbox" value="admin" {% if User.is_admin %}checked{% endif %}></div></div>
 		{% endif %}	

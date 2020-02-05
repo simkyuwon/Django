@@ -7,6 +7,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 import sys
 from django.dispatch import receiver
 from django.db.models.signals import post_delete
+from django.utils import timezone
 # Create your models here.
 def path_and_rename(instance, filename):
 	upload_to = 'image'
@@ -14,15 +15,24 @@ def path_and_rename(instance, filename):
 	filename = '{}.{}'.format(uuid.uuid4(), ext)
 	return os.path.join(upload_to, filename)
 
+KINDS_OF_COMPANY = [
+	('1CO','1CO'),
+	('2CO','2CO'),
+	('3CO','3CO'),
+	('HQ','HQ'),
+	('AD','admin'),
+]
+
 class UserManager(BaseUserManager):
 	use_in_migrations = True
 
-	def create_user(self, serviceNumber, name, password=None):
+	def create_user(self, serviceNumber, name, company, password=None):
 		if not serviceNumber :
 			raise ValueError('must have user serviceNumber')
 		user = self.model(
 			serviceNumber = serviceNumber,
-			name = name
+			name = name,
+			company = company
 		)
 		user.is_active = False
 		user.set_password(password)
@@ -45,7 +55,8 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser):
 	serviceNumber = models.CharField(max_length=15, primary_key=True)
 	name = models.CharField(max_length=5)
-	is_active = models.BooleanField(default=True)
+	company = models.CharField(max_length=3, choices=KINDS_OF_COMPANY)
+	is_active = models.BooleanField(default=False)
 	is_admin = models.BooleanField(default=False)
 	is_superuser = models.BooleanField(default=False)
 	is_staff = models.BooleanField(default=False)
@@ -72,6 +83,7 @@ class FireExtinguisherList(models.Model):
 	lastInspectionDate = models.DateField()
 	mainInspector = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 	image = models.ImageField(upload_to=path_and_rename, blank=True)
+	company = models.CharField(max_length=3, choices=KINDS_OF_COMPANY)
 
 	def save(self):
 		img = Image.open(self.image)
@@ -96,6 +108,9 @@ class FireExtinguisherList(models.Model):
 			self.image = InMemoryUploadedFile(output, 'ImageField',"image/JPEG", "%s"%self.image.name, sys.getsizeof(output), None)
 		super(FireExtinguisherList, self).save()
 
+	def update(self):
+		super(FireExtinguisherList, self).save()
+
 	def __str__(self):
 		return self.place
 
@@ -106,9 +121,10 @@ def FireExtinguisherList_post_delete(sender, instance, **kwargs):
 
 class InspectionDateList(models.Model):
 	fireExtinguisher = models.ForeignKey(FireExtinguisherList , on_delete=models.SET_NULL, null=True)
-	inspectionDate = models.DateTimeField(auto_now=True)
+	inspectionDate = models.DateTimeField(default = timezone.now)
 	inspector = models.ForeignKey(User, on_delete = models.SET_NULL, null=True)
-	result = models.CharField(max_length=50)
+	result = models.TextField()
+	action = models.TextField()
 
 	def __str__(self):
 		return self.fireExtinguisher.place
