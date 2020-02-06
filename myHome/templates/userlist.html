@@ -38,7 +38,7 @@
 		<option value="serviceNumber">군번</option>
 		<option value="name">이름</option>	
 	</select>
-	<input type="text" name="search" value={{search}}> 
+	<input type="text" name="search" class="text-box" value={{search}}> 
 	<input class="submit-btn" style="float:right" type="submit" value="검색"> 
 	<select name="sort" style="float:right; margin-right:5px" class="select-box">                             
 		<option value="serviceNumber" selected="selected">군번 오름차순</option>
@@ -49,30 +49,32 @@
 </div>
 <div class="list">
 <table class="list-table">	
-	<tr><td style="width:8em">군번</td><td>이름</td></tr>
+	<tr><td style="width:8em">군번</td><td style="width:3em">중대</td><td>이름</td></tr>
 	{% for User in userList %}
 		{% if User.is_active %}
 		<tr>
 			<td><a style="color:#000000" href="/updateuser?serviceNumber={{User.serviceNumber}}">{{User.serviceNumber}}</a></td>
+			<td>{{User.company}}</td>
 			<td>{{User.name}}</td>
 		</tr>
 		{% else %}
 		<tr style="color:#909090">
 			<td onclick="userActivation({{User.serviceNumber}})">{{User.serviceNumber}}</td>
+			<td>{{User.company}}</td>
 			<td>{{User.name}}</td>
 		</tr>
 		{% endif %}
 	{% endfor %}
 </table>
 	<div class="page-select">
-		<input id="down" type="button" value="<">
-		<input type="text" name="pagenumber" id="pgnum" style="text-align:center; width:2em" value= 
+		<input id="down" type="image" class="page-button" src="{% static "/img/left.png" %}">
+		<input type="text" name="pagenumber" id="pgnum" class="page-text" value= 
 		{% if pageNumber %}
 			{{pageNumber}}
 		{% else %}
 			1
 		{% endif %}>
-		<input id="up" type="button" value=">">
+		<input id="up" type="image" class="page-button" src="{% static "/img/right.png" %}">
 	</div>
 </div>
 </form>

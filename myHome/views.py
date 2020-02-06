@@ -46,6 +46,8 @@ def list(request, *args, **kwargs):
 			fireExtinguisherList = fireExtinguisherList.filter(company = user.company)
 		if getSort:
 			fireExtinguisherList = fireExtinguisherList.order_by(getSort)
+		else:
+			fireExtinguisherList = fireExtinguisherList.order_by("place")
 		pageSize = 20
 		maxPageNumber = int(fireExtinguisherList.count()/pageSize)
 		if fireExtinguisherList.count()%pageSize:

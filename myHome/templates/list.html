@@ -64,7 +64,7 @@
 			<option value="place">장소</option>
 			<option value="mainInspector">담당자</option>
 		</select>
-		<input type="text" name="search" value={{search}}>
+		<input type="text" class="text-box" name="search" value={{search}}>
 		{% if user.is_admin %}
 			<select name="mode" class="select-box" id="mode-select" style="float:right">
 				<option value="" selected="selected">선택</option>
@@ -90,7 +90,7 @@
 		<tr>
 		{% if user.is_admin %}
 			<td style="width:1em"><input type="checkbox" id="ck-all"></td>
-		{% endif %}<td style="width:10em">소화기 위치</td><td style="width:3em">소속</td><td>마지막 점검일</td><td style="width:8em">담당자</td><td style="width:5em">image</td></tr>
+		{% endif %}<td style="width:8em">소화기 위치</td><td style="width:2.5em">소속</td><td>마지막 점검일</td><td style="width:4em">담당자</td><td style="width:3em">image</td></tr>
 		{% for fireExtinguisher in fireExtinguisherList %}
 		<tr>
 			{% if user.is_admin %}
@@ -104,21 +104,21 @@
 			<td>{{fireExtinguisher.mainInspector}}</td>
 			<td>	
 			{% if fireExtinguisher.image %}
-				<img style="width:5em; height:5em"src="{{fireExtinguisher.image.url}}" alt="not found">
+				<img style="width:3em; height:3em"src="{{fireExtinguisher.image.url}}" alt="not found">
 			{% endif %}
 			</td>
 		</tr>	
 	{% endfor %}
 	</table>
 	<div class="page-select">
-		<input id="down" type="button" value="<">
-		<input type="text" name="pagenumber" id="pgnum" style="text-align:center; width:2em" value=
+		<input id="down" type="image" class="page-button" src="{% static "/img/left.png" %}">
+		<input type="text" name="pagenumber" id="pgnum" class="page-text" value=
 		{% if pageNumber %}
 			{{pageNumber}}
 		{% else %}
 			1
 		{% endif %}>
-		<input id="up" type="button" value=">">
+		<input id="up" type="image" class="page-button" src="{% static "/img/right.png" %}">
 	</div>
 </form>
 </div>

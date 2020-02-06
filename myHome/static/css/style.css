@@ -2,6 +2,16 @@ html, body {
 	margin : 0;
 	padding : 0;
 	height : 100%;
+	font-size : 10px;
+}
+
+@media ( max-width : 1023px ){
+	html, body {
+		margin : 0;
+		padding : 0;
+		height : 100%;
+		font-size : 15px;
+	}
 }
 
 a,a:visited,a:hover,a:focus,a:active {
@@ -11,48 +21,62 @@ a,a:visited,a:hover,a:focus,a:active {
 
 .top-menu {
 	width : 100%;
-	height : 60px;
-	line-height : 60px;
+	height : 1.5em;
+	line-height : 1.5em;
 	padding-right : 1em;
 	left : 0px;
 	top : 0px;
 	text-align : right;
 	background-color: #6090E0;
-	font-size : 40px;
+	font-size : 4em;
 	color : #FFFFFF;
 }
 
 .error-text {
-	font-size : 20px;
+	font-size : 2em;
 	color : #FF0000;
-	margin-top : 10px;
+	margin-top : 1em;
+	text-align : center;
 }
 
 .container {
 	width : 50%;
-	margin : 30% auto;
-	padding : 10px;
-	border : 5px solid #6090E0;
-	border-radius 10px;
-	font-size : 20px;
+	margin : 30% 25% 0px;
+	padding : 1em;
+	border : 0.3em solid #6090E0;
+	font-size : 2em;
 	text-align : center;
 	font-color : #6090E0;
 }
 
+@media ( max-width : 1023px ){
+	.container {
+		width : 70%;
+		margin : 30% 15% 0px;
+		padding : 1em;
+		border : 0.3em solid #6090E0;
+		font-size : 2em;
+		text-align : center;
+		font-color : #6090E0;
+	}
+}
+
 .form-main {
 	height : 50%;
-	margin-top : 20px;
+	margin-top : 2em;
 }
 
 .form-line {
 	width : 100%;
-	margin : 10px 0px;
+	margin : 1em 0px;
+	font-size : 1em;
 	vertical-align : middle;
 	padding : auto;
 }
 
 .form-text {
 	width : 35%;
+	font-size : 1em;
 	text-align : right;
 	float : left;
 	height : 1.5em;
@@ -60,23 +84,36 @@ a,a:visited,a:hover,a:focus,a:active {
 
 .form-input {
 	width : 45%;
+	font-size : 1em;
 	height : 1.5em;
 	border : #6090E0 1.5px solid;
 }
 
 .submit-btn {
-	width : 6em;
-	height : 2em;
+	width : 4em;
+	padding : 2px;
+	font-size : 1em;
+	border : 1.5px solid #4050F0;
+	background : #6090E0;
+	color : #FFFFFF;
 }
 
 .select-box {
-	height : 2em;
+	padding : 3px;
+	font-size : 1em;
+}
+
+.text-box {
+	border : 1.5px solid #6090E0;
+	padding : 3px;
+	width : 6em;
+	font-size : 1em;
 }
 
 .not-login-main {
 	height : 100%;
 	padding : 30% 0%;
-	font-size : 50px;
+	font-size : 5em;
 	text-align : center;
 	color : #FF4020;
 }
@@ -92,15 +129,16 @@ a,a:visited,a:hover,a:focus,a:active {
 }
 
 .search {
-	font-size : 15px;
-	margin : 10px 5%;	
+	font-size : 1.5em;
+	height : 1.5em;
+	margin : 1em 5%;
 }
 
 .list {
 	width : 90%;
-	font-size : 20px;
+	font-size : 2em;
 	text-align : center;
-	margin : 10px auto;
+	margin : 1em auto;
 }
 
 .list-table {
@@ -112,7 +150,20 @@ a,a:visited,a:hover,a:focus,a:active {
 .page-select {
 	width : 100%;
 	display : inline-block;
-	margin-top : 10px;
+	margin-top : 1em;
+}
+
+.page-button {
+	padding : 1px 0px;
+	 width: 1em;
+}
+
+.page-text{
+	font-size : 1em;
+	text-align : center;
+	width : 2em;
+	padding : 1px;
+	border : 0px;
 }
 
 td {
@@ -126,7 +177,7 @@ td.qr {
 }
 
 .inspection-main {
-	font-size : 20px;
+	font-size : 2em;
 	color : #000000;
 }
 

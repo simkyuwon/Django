@@ -17,12 +17,7 @@
 	function submitDetail(id){
 		var newForm = $('<form method="post">{% csrf_token %}</form>');
 		newForm.attr("action","/updateinspectiondate/"+id);	
-		if($('#action'+id).val() == ''){	
-			newForm.append($('<input/>',{type:'hidden', name:'action', value:"확인"}));
-		}
-		else{
-			newForm.append($('<input/>',{type:'hidden', name:'action', value:$('#action'+id).val()}));
-		}
+		newForm.append($('<input/>',{type:'hidden', name:'action', value:$('#action'+id).val()}));
 		newForm.appendTo('body');
 		newForm.submit();	
 	}
@@ -79,7 +74,7 @@
 			}
 		});
 
-		$("#end").val(new Date().toISOString().substring(0,10));	
+		$("input[name=end]").val(new Date().toISOString().substring(0,10));	
 	});
 </script>
 <div class="top-menu">
@@ -91,8 +86,8 @@
 			<option value="place">장소</option>
 			<option value="mainInspector">담당자</option>
 		</select>
-		<input type="text" name="search" value={{search}}>
-		<input type="date" name="start">~<input type="date" name="end" id="end">
+		<input type="text" name="search" class="text-box" value={{search}}>
+		<input type="date" name="start" style="font-size:1em; width:8em">~<input type="date" name="end" style="font-size:1em; width:8em">
 		<input class="submit-btn" style="float:right" type="submit" id="search-submit" value="검색">
 		{% if user.is_admin %}	
 			<input class="submit-btn" style="float:right; margin-right:10px" type="submit" name="delete" value="삭제">
@@ -142,14 +137,14 @@
 			{% endfor %}
 		</table>
 		<div class="page-select">
-			<input id="down" type="button" value="<">
-			<input type="text" name="pagenumber" id="pgnum" style="text-align:center; width:2em" value=
+			<input id="down" type="image" class="page-button" src="{% static "/img/left.png" %}">
+			<input type="text" name="pagenumber" id="pgnum" class="page-text" value=
 			{% if pageNumber %}
 				{{pageNumber}}
 			{% else %}
 				1
 			{% endif %}>
-			<input id="up" type="button" value=">">
+			<input id="up" type="image" class="page-button" src="{% static "/img/right.png" %}">
 		</div>
 	</div>
 </form>
