@@ -8,10 +8,9 @@
 	$(function(){
 		$("input[name=qrimg]").change(function(){
 			var size = $("input[name=qrimg]")[0].files[0].size;
-			if(size > 1024*1024){
-				alert("첨부파일 사이즈는 1MB 이내로 등록 가능합니다.");
-				$("input[name=qrimg]").val("");
-			}
+			var type = $("input[name=qrimg]")[0].files[0].type;
+			$("input[name=file-size]").val(size);
+			$("input[name=file-type]").val(type.substring(6));
 		});
 	});
 </script>
@@ -26,6 +25,8 @@
 		<div class="form-line"><div class="form-text">QR 값 직접입력</div><input class="form-input" name="qrdata" type="text"/></div>
 		<div class="form-line"><div class="form-text">특이사항</div><input class="form-input" name="result" type="text" value="이상 없음"></div>
 		<input class="submit-btn" type="submit" value="확인"/>
+		<input type="text" name="file-size" hidden/>
+		<input type="text" name="file-type" hidden/>
 	</form>
 </div>
 <div class="error-text">{{error}}</div>

@@ -80,6 +80,7 @@ a,a:visited,a:hover,a:focus,a:active {
 	text-align : right;
 	float : left;
 	height : 1.5em;
+	line-height : 1.5em;
 }
 
 .form-input {
@@ -104,9 +105,9 @@ a,a:visited,a:hover,a:focus,a:active {
 }
 
 .text-box {
-	border : 1.5px solid #6090E0;
+	border : 1.5px solid #000000;
 	padding : 3px;
-	width : 6em;
+	width : 7em;
 	font-size : 1em;
 }
 

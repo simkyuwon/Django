@@ -10,6 +10,7 @@ import requests
 import json
 from PIL import Image
 from io import BytesIO
+import math
 # Create your views here.
 
 def index(request):
@@ -302,6 +303,17 @@ def qrapi(request):
 		if 'qrimg' not in request.FILES:
 			return render(request,'qrreader.html', {'error':'이미지나 값이 필요합니다.'})
 		files = {'file':request.FILES['qrimg']}
+		img_file = BytesIO(files['file'].read())
+		img = Image.open(img_file)
+		file_size = request.POST['file-size']
+		if(int(file_size) > 1024000):
+			ratio = math.sqrt(1024000/float(file_size))
+			resize_img = img.resize((int(img.size[0] * ratio ), int(img.size[1] * ratio)))
+		else:
+			resize_img = img
+		buf = BytesIO()
+		resize_img.save(buf, format=request.POST['file-type'])
+		files = {'file':buf.getvalue()}
 		response = requests.post("http://api.qrserver.com/v1/read-qr-code/", data = {"MAX_FILE_SIZE" : "1048576"},  files = files)
 		responseJson = response.json()
 		if responseJson[0]['symbol'][0]['error'] == "could not find/read QR Code":
