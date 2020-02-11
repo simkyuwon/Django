@@ -99,7 +99,7 @@
 			{% if user.is_admin %}
 				<td style="width:1em"><input type="checkbox" id="ck-all"></td>
 			{% endif %}
-				<td style="width:8em">소화기 위치</td><td style="width:3em">중대</td><td style="width:14em">마지막 점검일</td><td style="width:5em">담당자</td><td style="width:3em">detail</td></tr>     	
+				<td style="width:8em">소화기 위치</td><td style="width:3em">중대</td><td style="width:14em">마지막 점검일</td><td style="width:5em">담당자</td><td style="width:3em">점검 현황</td></tr>     	
 			{% for inspectionDate in inspectionDateList %}
 				<tr name="simple">
 				{% if user.is_admin %}

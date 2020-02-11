@@ -90,7 +90,7 @@
 		<tr>
 		{% if user.is_admin %}
 			<td style="width:1em"><input type="checkbox" id="ck-all"></td>
-		{% endif %}<td style="width:8em">소화기 위치</td><td style="width:2.5em">소속</td><td>마지막 점검일</td><td style="width:4em">담당자</td><td style="width:3em">image</td></tr>
+		{% endif %}<td style="width:8em">소화기 위치</td><td style="width:2.5em">소속</td><td>마지막 점검일</td><td style="width:4em">담당자</td><td style="width:3em">형상정보</td></tr>
 		{% for fireExtinguisher in fireExtinguisherList %}
 		<tr>
 			{% if user.is_admin %}
